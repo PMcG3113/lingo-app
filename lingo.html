@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lingo 🌈</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #FF6B9D;
+      --yellow: #FFD93D;
+      --blue: #74B9FF;
+      --red: #FF6B6B;
+      --purple: #A29BFE;
+      --green: #55EFC4;
+      --orange: #FDCB6E;
+      --dark: #2D3436;
+      --light: #FFF6F0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Nunito', sans-serif; background: var(--light); min-height: 100vh; overflow-x: hidden; }
+
+    /* ─── SCREENS ─── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes float      { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-18px) rotate(8deg)} }
+    @keyframes floatB     { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-12px) rotate(-6deg)} }
+    @keyframes bounce     { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+    @keyframes shimmer    { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+    @keyframes wiggle     { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
+    @keyframes fadeSlideUp{ from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes sparkle    { 0%,100%{opacity:0;transform:scale(0)} 50%{opacity:1;transform:scale(1)} }
+
+    /* ─── WELCOME ─── */
+    #welcome-screen {
+      background: linear-gradient(145deg, #FF6B9D 0%, #FFD93D 30%, #74B9FF 60%, #A29BFE 100%);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 24px; text-align: center;
+      min-height: 100vh; position: relative; overflow: hidden;
+    }
+    /* Floating emoji decoration on welcome screen */
+    #welcome-screen::before {
+      content: '🌍 ✨ 🗺️ 💬 🌟 🎉 🌈 ⭐';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      font-size: 28px; display: flex; flex-wrap: wrap;
+      align-items: flex-start; justify-content: space-around;
+      padding: 20px; opacity: 0.18; pointer-events: none;
+      letter-spacing: 20px; line-height: 2.5;
+    }
+    .floater {
+      position: absolute; font-size: 28px; pointer-events: none; user-select: none;
+      opacity: 0.22;
+    }
+    .floater:nth-child(1)  { top:6%;  left:8%;  animation: float  4.2s ease-in-out infinite; }
+    .floater:nth-child(2)  { top:12%; right:10%;animation: floatB 3.8s ease-in-out infinite 0.5s; }
+    .floater:nth-child(3)  { top:30%; left:5%;  animation: float  5s   ease-in-out infinite 1s; }
+    .floater:nth-child(4)  { top:55%; right:6%; animation: floatB 4.5s ease-in-out infinite 0.3s; }
+    .floater:nth-child(5)  { bottom:18%;left:10%;animation: float 3.5s ease-in-out infinite 0.8s; }
+    .floater:nth-child(6)  { bottom:10%;right:12%;animation:floatB 4s  ease-in-out infinite 1.2s; }
+    .app-icon {
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, #FF6B9D, #FFD93D 40%, #74B9FF 70%, #A29BFE);
+      border-radius: 30px; display: flex; align-items: center; justify-content: center;
+      font-family: 'Fredoka One', cursive; font-size: 28px; color: white;
+      margin-bottom: 18px; box-shadow: 0 12px 40px rgba(0,0,0,0.25), 0 0 0 6px rgba(255,255,255,0.3);
+      letter-spacing: -1px; animation: bounce 3s ease-in-out infinite;
+      position: relative; z-index: 1;
+    }
+    /* Sparkles around the icon */
+    .icon-wrap { position: relative; display: inline-block; margin-bottom: 18px; }
+    .icon-wrap .app-icon { margin-bottom: 0; }
+    .sparkle { position: absolute; font-size: 18px; animation: sparkle 2s ease-in-out infinite; }
+    .sparkle:nth-child(2) { top:-10px; right:-8px;  animation-delay:0s; }
+    .sparkle:nth-child(3) { bottom:-8px; left:-10px; animation-delay:0.7s; }
+    .sparkle:nth-child(4) { top:10px; left:-16px;   animation-delay:1.3s; }
+
+    .welcome-title {
+      font-family: 'Fredoka One', cursive; font-size: 68px; color: white;
+      text-shadow: 4px 4px 0 rgba(0,0,0,0.12), 0 0 40px rgba(255,255,255,0.3);
+      margin-bottom: 6px; line-height: 1; position: relative; z-index: 1;
+      animation: fadeSlideUp 0.6s ease both;
+    }
+    .welcome-sub {
+      font-size: 17px; color: white; opacity: 0.95; margin-bottom: 32px; font-weight: 800;
+      background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 30px;
+      backdrop-filter: blur(8px); position: relative; z-index: 1;
+      animation: fadeSlideUp 0.6s ease 0.1s both;
+    }
+    .welcome-card {
+      background: white; border-radius: 32px; padding: 28px 24px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.5);
+      position: relative; z-index: 1; animation: fadeSlideUp 0.6s ease 0.2s both;
+    }
+    /* Cute rainbow top border on card */
+    .welcome-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--pink), var(--yellow), var(--green), var(--blue), var(--purple));
+      border-radius: 32px 32px 0 0;
+    }
+    .welcome-card h2 {
+      font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--dark);
+      margin-bottom: 18px; margin-top: 8px;
+    }
+    .name-input {
+      width: 100%; padding: 14px 18px; border: 3px solid #f0e8ff; border-radius: 14px;
+      font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 700;
+      color: var(--dark); outline: none; transition: all 0.2s; margin-bottom: 20px;
+      background: #fdfbff;
+    }
+    .name-input:focus { border-color: var(--purple); background: white; box-shadow: 0 0 0 4px rgba(162,155,254,0.15); }
+    .avatar-label { font-weight: 800; color: var(--dark); margin-bottom: 10px; display: block; font-size: 15px; }
+    .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 22px; }
+    .avatar-btn {
+      aspect-ratio: 1; border: 3px solid #f0e8ff; border-radius: 14px; background: #fdfbff;
+      font-size: 22px; cursor: pointer; transition: all 0.2s; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .avatar-btn:hover { transform: scale(1.12); border-color: var(--pink); }
+    .avatar-btn.selected {
+      border-color: var(--purple); background: #f0eeff; transform: scale(1.15);
+      box-shadow: 0 4px 14px rgba(162,155,254,0.4);
+    }
+    .start-btn {
+      width: 100%; padding: 17px; border: none; border-radius: 18px;
+      font-family: 'Fredoka One', cursive; font-size: 22px; cursor: pointer;
+      background: linear-gradient(135deg, var(--purple), var(--pink), var(--orange));
+      background-size: 200% 200%; color: white;
+      box-shadow: 0 6px 20px rgba(162,155,254,0.5), 0 2px 0 rgba(0,0,0,0.1);
+      transition: all 0.2s; animation: wiggle 3s ease-in-out infinite;
+    }
+    .start-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 28px rgba(162,155,254,0.6); animation: none; }
+    .start-btn:active { transform: translateY(0) scale(0.98); }
+
+    /* ─── MAIN ─── */
+    #main-screen {
+      background: var(--light); max-width: 480px; margin: 0 auto;
+      background-image: radial-gradient(circle at 20px 20px, rgba(162,155,254,0.06) 2px, transparent 0);
+      background-size: 40px 40px;
+    }
+    .app-header {
+      background: white; padding: 14px 18px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+      border-bottom: 4px solid transparent;
+      border-image: linear-gradient(90deg, var(--pink), var(--yellow), var(--green), var(--blue), var(--purple)) 1;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    }
+    .header-logo {
+      font-family: 'Fredoka One', cursive; font-size: 32px;
+      background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(162,155,254,0.3));
+    }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-user {
+      font-size: 14px; font-weight: 800; color: var(--dark);
+      max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .header-points {
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      color: var(--dark); font-weight: 900; font-size: 14px;
+      padding: 7px 14px; border-radius: 20px; display: flex; align-items: center; gap: 3px;
+      box-shadow: 0 3px 10px rgba(253,203,110,0.5); animation: bounce 2.5s ease-in-out infinite;
+    }
+
+    /* ─── LANG PICKER ─── */
+    .lang-section { padding: 18px 18px 0; }
+    .lang-label { font-weight: 900; color: #999; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
+    .lang-select {
+      width: 100%; padding: 13px 16px; border: 3px solid #e8e0ff; border-radius: 16px;
+      font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800;
+      color: var(--dark); background: white; outline: none; cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 2px 12px rgba(162,155,254,0.12);
+    }
+    .lang-select:focus { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(162,155,254,0.18); }
+
+    /* ─── TABS ─── */
+    .tabs { display: flex; gap: 10px; padding: 16px 18px; }
+    .tab-btn {
+      flex: 1; padding: 14px; border: none; border-radius: 16px;
+      font-family: 'Fredoka One', cursive; font-size: 17px; cursor: pointer;
+      transition: all 0.25s; background: white; color: #ccc;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 3px solid #f0f0f0;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white; box-shadow: 0 6px 20px rgba(116,185,255,0.4);
+      border-color: transparent; transform: translateY(-1px);
+    }
+
+    /* ─── CONTENT AREA ─── */
+    .tab-content { padding: 0 18px 120px; }
+
+    /* ─── CATEGORIES ─── */
+    .categories-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .cat-card {
+      background: white; border-radius: 22px; padding: 24px 14px; text-align: center;
+      cursor: pointer; transition: all 0.22s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+      border: 3px solid transparent;
+    }
+    .cat-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 12px 32px rgba(0,0,0,0.13); }
+    .cat-card:active { transform: translateY(-1px) scale(0.99); }
+    .cat-emoji { font-size: 42px; margin-bottom: 10px; display: block; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.12)); }
+    .cat-name { font-family: 'Fredoka One', cursive; font-size: 15px; color: var(--dark); line-height: 1.3; }
+
+    /* ─── PHRASE LIST ─── */
+    .phrase-list-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .back-btn {
+      background: white; border: 3px solid #f0e8ff; border-radius: 14px; padding: 10px 14px;
+      font-size: 15px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 2px 10px rgba(162,155,254,0.15); transition: all 0.2s;
+      color: var(--purple); white-space: nowrap;
+    }
+    .back-btn:hover { transform: scale(1.05); background: #f8f0ff; }
+    .phrase-cat-title { font-family: 'Fredoka One', cursive; font-size: 20px; color: var(--dark); }
+    .phrase-item {
+      background: white; border-radius: 18px; padding: 16px; margin-bottom: 10px;
+      cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.06); transition: all 0.2s;
+      border-left: 5px solid #eee; border: 2px solid #f5f0ff; border-left: 5px solid #e0d8ff;
+    }
+    .phrase-item:hover { transform: translateX(5px); box-shadow: 0 6px 20px rgba(162,155,254,0.18); border-left-color: var(--purple); }
+    .phrase-item.expanded { border-left-color: var(--purple); background: linear-gradient(135deg, #fdfbff, #f8f4ff); }
+    .phrase-english { font-weight: 800; color: var(--dark); font-size: 15px; }
+    .tap-hint { font-size: 12px; color: #ccc; margin-top: 4px; font-weight: 700; letter-spacing: 0.3px; }
+    .phrase-translation { display: none; margin-top: 12px; padding-top: 12px; border-top: 2px dashed #ede8ff; }
+    .phrase-item.expanded .phrase-translation { display: block; animation: fadeSlideUp 0.2s ease both; }
+    .phrase-translated-text { font-size: 24px; font-weight: 900; color: var(--purple); margin-bottom: 8px; }
+    .phrase-pronunciation {
+      font-size: 13px; color: #888; font-style: italic; background: #f9f9f9;
+      padding: 6px 10px; border-radius: 8px; display: inline-block; margin-top: 2px;
+    }
+    .speak-btn {
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      border: none; border-radius: 10px; padding: 8px 14px;
+      font-size: 16px; cursor: pointer; margin-top: 10px; display: inline-flex;
+      align-items: center; gap: 6px; font-family: 'Fredoka One', cursive;
+      font-size: 14px; color: white; box-shadow: 0 3px 10px rgba(85,239,196,0.4);
+      transition: all 0.2s;
+    }
+    .speak-btn:hover { transform: scale(1.05); }
+    .speak-btn:active { transform: scale(0.97); }
+    .speak-btn.speaking { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+
+    /* ─── TRANSLATE TAB ─── */
+    .wifi-note {
+      background: #fff8e6; border: 2px solid var(--yellow); border-radius: 14px;
+      padding: 12px 14px; font-size: 13px; font-weight: 700; color: #8B6914;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .translate-box {
+      background: white; border-radius: 20px; padding: 18px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.07); margin-bottom: 14px;
+    }
+    .translate-textarea {
+      width: 100%; padding: 14px; border: 3px solid #eee; border-radius: 12px;
+      font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700;
+      color: var(--dark); resize: none; height: 110px; outline: none; transition: border-color 0.2s;
+    }
+    .translate-textarea:focus { border-color: var(--blue); }
+    .translate-btn {
+      width: 100%; padding: 15px; background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive;
+      font-size: 20px; cursor: pointer; margin-top: 12px;
+      box-shadow: 0 6px 20px rgba(116,185,255,0.4); transition: all 0.2s;
+    }
+    .translate-btn:hover { transform: translateY(-2px); }
+    .translate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .translate-result {
+      background: linear-gradient(135deg, #f0eeff, #e8f4ff); border-radius: 18px;
+      padding: 20px; display: none; animation: popIn 0.3s ease;
+    }
+    @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .translate-result.visible { display: block; }
+    .result-label { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; color: var(--purple); margin-bottom: 10px; }
+    .result-text { font-size: 26px; font-weight: 900; color: var(--dark); line-height: 1.3; }
+
+    /* ─── POINTS POPUP ─── */
+    .points-popup {
+      position: fixed; top: 72px; right: 18px;
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      color: var(--dark); font-family: 'Fredoka One', cursive; font-size: 20px;
+      padding: 10px 20px; border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(253,203,110,0.5); z-index: 999;
+      transform: translateY(-16px) scale(0.9); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none;
+    }
+    .points-popup.show { transform: translateY(0) scale(1); opacity: 1; }
+
+    /* ─── MILESTONE ─── */
+    .milestone {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .milestone.show { opacity: 1; pointer-events: all; }
+    .milestone-card {
+      background: white; border-radius: 28px; padding: 36px 32px; text-align: center;
+      max-width: 320px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+      transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .milestone.show .milestone-card { transform: scale(1); }
+    .milestone-emoji { font-size: 60px; margin-bottom: 12px; display: block; }
+    .milestone-title { font-family: 'Fredoka One', cursive; font-size: 28px; color: var(--dark); margin-bottom: 8px; }
+    .milestone-sub { font-size: 16px; font-weight: 700; color: #888; margin-bottom: 20px; }
+    .milestone-close {
+      padding: 14px 28px; background: linear-gradient(135deg, var(--purple), var(--pink));
+      color: white; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive;
+      font-size: 18px; cursor: pointer;
+    }
+
+    /* ─── CONVO TAB ─── */
+    .convo-intro {
+      background: linear-gradient(135deg, #f5f0ff, #e8f4ff); border-radius: 18px;
+      padding: 16px; margin-bottom: 16px; text-align: center;
+      border: 2px solid #e0d8ff;
+    }
+    .convo-intro p { font-size: 13px; font-weight: 700; color: #666; line-height: 1.6; }
+    .chat-window {
+      background: white; border-radius: 22px; min-height: 240px; max-height: 360px;
+      overflow-y: auto; padding: 16px; margin-bottom: 14px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.07); border: 2px solid #f0eaff;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .chat-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 200px; color: #ccc; font-weight: 700; font-size: 15px; text-align: center; gap: 10px;
+    }
+    .chat-empty .emoji { font-size: 44px; }
+    .bubble-wrap { display: flex; flex-direction: column; max-width: 85%; animation: fadeSlideUp 0.25s ease both; }
+    .bubble-wrap.me   { align-self: flex-end; align-items: flex-end; }
+    .bubble-wrap.them { align-self: flex-start; align-items: flex-start; }
+    .bubble-who { font-size: 11px; font-weight: 900; margin-bottom: 4px; letter-spacing: 0.5px; }
+    .bubble-wrap.me   .bubble-who { color: var(--purple); }
+    .bubble-wrap.them .bubble-who { color: var(--pink); }
+    .bubble {
+      padding: 12px 16px; border-radius: 20px; font-weight: 700; font-size: 15px; line-height: 1.4;
+    }
+    .bubble-wrap.me .bubble {
+      background: linear-gradient(135deg, var(--purple), #7c6ef5);
+      color: white; border-bottom-right-radius: 6px;
+    }
+    .bubble-wrap.them .bubble {
+      background: linear-gradient(135deg, var(--pink), #ff8fab);
+      color: white; border-bottom-left-radius: 6px;
+    }
+    .bubble-sub {
+      font-size: 12px; font-weight: 700; margin-top: 5px; padding: 5px 12px;
+      border-radius: 10px; display: inline-block;
+    }
+    .bubble-wrap.me   .bubble-sub { background: #f0eeff; color: var(--purple); }
+    .bubble-wrap.them .bubble-sub { background: #fff0f5; color: var(--pink); }
+    .convo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .convo-btn {
+      padding: 16px 10px; border: none; border-radius: 18px; cursor: pointer;
+      font-family: 'Fredoka One', cursive; font-size: 16px; transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 6px; line-height: 1.2;
+    }
+    .convo-btn .btn-icon { font-size: 28px; }
+    .convo-btn-me {
+      background: linear-gradient(135deg, var(--purple), #7c6ef5);
+      color: white; box-shadow: 0 6px 20px rgba(162,155,254,0.45);
+    }
+    .convo-btn-them {
+      background: linear-gradient(135deg, var(--pink), #ff8fab);
+      color: white; box-shadow: 0 6px 20px rgba(255,107,157,0.4);
+    }
+    .convo-btn:hover { transform: translateY(-3px) scale(1.02); }
+    .convo-btn:active { transform: translateY(0) scale(0.98); }
+    .convo-btn.recording { animation: pulse-record 0.8s ease-in-out infinite; }
+    @keyframes pulse-record {
+      0%,100% { transform: scale(1); box-shadow: 0 6px 20px rgba(255,107,157,0.4); }
+      50%      { transform: scale(1.04); box-shadow: 0 8px 30px rgba(255,107,157,0.7); }
+    }
+    .convo-type-row { display: flex; gap: 10px; }
+    .convo-input {
+      flex: 1; padding: 13px 16px; border: 3px solid #e8e0ff; border-radius: 14px;
+      font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+      color: var(--dark); outline: none; transition: all 0.2s; background: white;
+    }
+    .convo-input:focus { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(162,155,254,0.15); }
+    .convo-send {
+      padding: 13px 18px; background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white; border: none; border-radius: 14px; font-size: 20px;
+      cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(116,185,255,0.4);
+    }
+    .convo-send:hover { transform: scale(1.08); }
+
+    .convo-mic-btn {
+      padding: 13px 14px; background: linear-gradient(135deg, var(--green), var(--blue));
+      color: white; border: none; border-radius: 14px; font-size: 18px;
+      cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(85,239,196,0.4);
+      flex-shrink: 0;
+    }
+    .convo-mic-btn:hover { transform: scale(1.1); }
+    .convo-mic-btn.recording { animation: pulse-record 0.8s ease-in-out infinite;
+      background: linear-gradient(135deg, var(--red), var(--pink)); }
+    .clear-chat-btn {
+      width: 100%; padding: 10px; background: none; border: 2px solid #eee;
+      border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 13px;
+      font-weight: 800; color: #bbb; cursor: pointer; margin-top: 8px; transition: all 0.2s;
+    }
+    .clear-chat-btn:hover { border-color: var(--red); color: var(--red); }
+    .status-bar {
+      text-align: center; font-size: 13px; font-weight: 800; color: var(--purple);
+      padding: 8px; min-height: 32px; transition: all 0.3s;
+    }
+
+    /* ─── SCROLLABLE TABS ─── */
+    .tabs-scroll {
+      display: flex; gap: 8px; padding: 14px 18px; overflow-x: auto;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .tabs-scroll::-webkit-scrollbar { display: none; }
+    .tabs-scroll .tab-btn {
+      flex-shrink: 0; padding: 11px 14px; border: none; border-radius: 14px;
+      font-family: 'Fredoka One', cursive; font-size: 14px; cursor: pointer;
+      transition: all 0.22s; background: white; color: #ccc;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 2px solid #f0f0f0; white-space: nowrap;
+    }
+    .tabs-scroll .tab-btn.active {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white; box-shadow: 0 6px 20px rgba(116,185,255,0.4);
+      border-color: transparent; transform: translateY(-1px);
+    }
+
+    /* ─── SHARED FEATURE STYLES ─── */
+    .feature-card {
+      border-radius: 20px; padding: 20px; text-align: center;
+      margin-bottom: 18px; border: 3px solid transparent;
+    }
+    .feature-icon { font-size: 44px; margin-bottom: 8px; }
+    .feature-title { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--dark); margin-bottom: 4px; }
+    .feature-sub { font-size: 14px; font-weight: 700; color: #888; }
+    .input-group { margin-bottom: 14px; }
+    .field-label { font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #999; display: block; margin-bottom: 7px; }
+    .feature-input {
+      width: 100%; padding: 14px 16px; border: 3px solid #e8e0ff; border-radius: 14px;
+      font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700;
+      color: var(--dark); outline: none; background: white; transition: all 0.2s;
+    }
+    .feature-input:focus { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(162,155,254,0.15); }
+    .feature-btn {
+      width: 100%; padding: 16px; border: none; border-radius: 16px; cursor: pointer;
+      font-family: 'Fredoka One', cursive; font-size: 20px; color: white;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15); transition: all 0.2s; margin-bottom: 14px;
+    }
+    .feature-btn:hover { transform: translateY(-2px); }
+    .feature-btn:active { transform: translateY(0); }
+    .feature-result { background: white; border-radius: 20px; padding: 22px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.08); border: 2px solid #f0eaff; animation: popIn 0.3s ease; }
+    .result-big { font-family: 'Fredoka One', cursive; font-size: 38px; color: var(--dark); margin-bottom: 8px; }
+    .result-hint { font-size: 14px; font-weight: 700; color: #aaa; }
+
+    /* ─── CURRENCY ─── */
+
+    /* ─── WEATHER ─── */
+    .weather-card { padding: 10px; }
+    .weather-city { font-family: 'Fredoka One', cursive; font-size: 26px; color: var(--dark); margin-bottom: 6px; }
+    .weather-main { font-size: 72px; line-height: 1; margin: 10px 0; }
+    .weather-temp { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--dark); }
+    .weather-desc { font-size: 16px; font-weight: 800; color: #888; margin: 8px 0; text-transform: capitalize; }
+    .weather-details { display: flex; justify-content: center; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+    .weather-detail { background: #f8f4ff; border-radius: 12px; padding: 10px 16px; text-align: center; }
+    .weather-detail .val { font-family: 'Fredoka One', cursive; font-size: 18px; color: var(--purple); }
+    .weather-detail .lbl { font-size: 11px; font-weight: 800; color: #aaa; text-transform: uppercase; }
+    .weather-advice { margin-top: 16px; background: linear-gradient(135deg,#f5f0ff,#e8f4ff); border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 700; color: #666; }
+
+    /* ─── QUIZ ─── */
+    .quiz-score-row { display: flex; gap: 8px; margin-bottom: 16px; justify-content: center; flex-wrap: wrap; }
+    .quiz-score-pill { color: white; font-family: 'Fredoka One', cursive; font-size: 14px; padding: 8px 14px; border-radius: 20px; }
+    .quiz-card {
+      background: white; border-radius: 22px; padding: 28px 20px; text-align: center;
+      margin-bottom: 16px; box-shadow: 0 4px 20px rgba(162,155,254,0.2);
+      border: 3px solid #e8e0ff; position: relative; overflow: hidden;
+    }
+    .quiz-lang-tag {
+      position: absolute; top: 14px; right: 14px; background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white; font-size: 11px; font-weight: 900; padding: 4px 10px;
+      border-radius: 10px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .quiz-question { font-size: 32px; font-weight: 900; color: var(--dark); margin-bottom: 10px; line-height: 1.3; }
+    .quiz-prompt { font-size: 14px; font-weight: 700; color: #aaa; }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .quiz-opt {
+      padding: 16px 10px; background: white; border: 3px solid #eee; border-radius: 16px;
+      font-family: 'Fredoka One', cursive; font-size: 15px; cursor: pointer;
+      transition: all 0.2s; color: var(--dark); text-align: center; line-height: 1.3;
+    }
+    .quiz-opt:hover { border-color: var(--purple); background: #f8f4ff; transform: scale(1.02); }
+    .quiz-opt.correct { background: linear-gradient(135deg,#55EFC4,#00b894); color: white; border-color: transparent; transform: scale(1.05); }
+    .quiz-opt.wrong   { background: linear-gradient(135deg,#FF6B6B,#ee5a24); color: white; border-color: transparent; opacity: 0.7; }
+    .quiz-opt.disabled { pointer-events: none; }
+    .quiz-feedback { text-align: center; font-family: 'Fredoka One', cursive; font-size: 22px; min-height: 36px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ WELCOME SCREEN ══════════════ -->
+<div id="welcome-screen" class="screen active">
+  <span class="floater">🌍</span>
+  <span class="floater">✨</span>
+  <span class="floater">🗺️</span>
+  <span class="floater">💬</span>
+  <span class="floater">🌟</span>
+  <span class="floater">🌈</span>
+  <div class="icon-wrap">
+    <div class="app-icon">Oui!</div>
+    <span class="sparkle">✨</span>
+    <span class="sparkle">⭐</span>
+    <span class="sparkle">💫</span>
+  </div>
+  <div class="welcome-title">Lingo</div>
+  <div class="welcome-sub">Your holiday language buddy 🌍</div>
+
+  <div class="welcome-card">
+    <h2>Let's get you set up! ✨</h2>
+    <input class="name-input" type="text" id="name-input" placeholder="What's your name?" maxlength="18">
+    <span class="avatar-label">Pick your avatar:</span>
+    <div class="avatar-grid">
+      <button class="avatar-btn selected" data-emoji="🦋">🦋</button>
+      <button class="avatar-btn" data-emoji="🦊">🦊</button>
+      <button class="avatar-btn" data-emoji="🐱">🐱</button>
+      <button class="avatar-btn" data-emoji="🐸">🐸</button>
+      <button class="avatar-btn" data-emoji="🦄">🦄</button>
+      <button class="avatar-btn" data-emoji="🐼">🐼</button>
+      <button class="avatar-btn" data-emoji="🌸">🌸</button>
+      <button class="avatar-btn" data-emoji="⭐">⭐</button>
+      <button class="avatar-btn" data-emoji="🌈">🌈</button>
+      <button class="avatar-btn" data-emoji="🎀">🎀</button>
+    </div>
+    <button class="start-btn" onclick="startApp()">Let's go! 🚀</button>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN SCREEN ══════════════ -->
+<div id="main-screen" class="screen">
+  <div class="app-header">
+    <div class="header-logo">Lingo</div>
+    <div class="header-right">
+      <div class="header-user" id="header-user">🦋 Arya</div>
+      <div class="header-points">⭐ <span id="points-display">0</span></div>
+    </div>
+  </div>
+
+  <div class="lang-section">
+    <span class="lang-label">🌍 Translate into:</span>
+    <select class="lang-select" id="lang-select" onchange="onLangChange()">
+      <option value="fr">🇫🇷 French</option>
+      <option value="es">🇪🇸 Spanish</option>
+      <option value="it">🇮🇹 Italian</option>
+      <option value="de">🇩🇪 German</option>
+      <option value="pt">🇵🇹 Portuguese</option>
+      <option value="nl">🇳🇱 Dutch</option>
+      <option value="el">🇬🇷 Greek</option>
+      <option value="tr">🇹🇷 Turkish</option>
+      <option value="pl">🇵🇱 Polish</option>
+      <option value="sv">🇸🇪 Swedish</option>
+      <option value="da">🇩🇰 Danish</option>
+      <option value="no">🇳🇴 Norwegian</option>
+      <option value="fi">🇫🇮 Finnish</option>
+      <option value="cs">🇨🇿 Czech</option>
+      <option value="hu">🇭🇺 Hungarian</option>
+      <option value="ro">🇷🇴 Romanian</option>
+      <option value="ru">🇷🇺 Russian</option>
+      <option value="ar">🇸🇦 Arabic</option>
+      <option value="ja">🇯🇵 Japanese</option>
+      <option value="ko">🇰🇷 Korean</option>
+      <option value="zh">🇨🇳 Chinese</option>
+      <option value="hi">🇮🇳 Hindi</option>
+    </select>
+  </div>
+
+  <div class="tabs-scroll">
+    <button class="tab-btn active" id="tab-phrases"   onclick="switchTab('phrases')">📚 Phrases</button>
+    <button class="tab-btn" id="tab-translate" onclick="switchTab('translate')">💬 Translate</button>
+    <button class="tab-btn" id="tab-convo"     onclick="switchTab('convo')">🎙️ Convo</button>
+    <button class="tab-btn" id="tab-currency"  onclick="switchTab('currency')">🗺️ Currency</button>
+    <button class="tab-btn" id="tab-weather"   onclick="switchTab('weather')">🌦️ Weather</button>
+    <button class="tab-btn" id="tab-quiz"      onclick="switchTab('quiz')">🎮 Quiz</button>
+  </div>
+
+  <!-- ── PHRASES TAB ── -->
+  <div class="tab-content" id="phrases-tab">
+    <div id="categories-view">
+      <div class="categories-grid">
+        <div class="cat-card" onclick="openCategory('greetings')" style="background:linear-gradient(135deg,#fff9e6,#fffde0);border-color:#FFD93D">
+          <span class="cat-emoji">👋</span><div class="cat-name">Greetings</div>
+        </div>
+        <div class="cat-card" onclick="openCategory('food')" style="background:linear-gradient(135deg,#fff0f5,#ffe8f0);border-color:#FF6B9D">
+          <span class="cat-emoji">🍕</span><div class="cat-name">Food & Restaurants</div>
+        </div>
+        <div class="cat-card" onclick="openCategory('directions')" style="background:linear-gradient(135deg,#f0f8ff,#e8f4ff);border-color:#74B9FF">
+          <span class="cat-emoji">🗺️</span><div class="cat-name">Getting Around</div>
+        </div>
+        <div class="cat-card" onclick="openCategory('shopping')" style="background:linear-gradient(135deg,#f0fff8,#e8fff4);border-color:#55EFC4">
+          <span class="cat-emoji">🛍️</span><div class="cat-name">Shopping</div>
+        </div>
+        <div class="cat-card" onclick="openCategory('hotel')" style="background:linear-gradient(135deg,#fffaf0,#fff6e0);border-color:#FDCB6E">
+          <span class="cat-emoji">🏨</span><div class="cat-name">Hotel</div>
+        </div>
+        <div class="cat-card" onclick="openCategory('emergency')" style="background:linear-gradient(135deg,#fff0f0,#ffe8e8);border-color:#FF6B6B">
+          <span class="cat-emoji">🚨</span><div class="cat-name">Emergencies</div>
+        </div>
+        <div class="cat-card" onclick="openCategory('fun')" style="background:linear-gradient(135deg,#f5f0ff,#ede8ff);border-color:#A29BFE; grid-column: span 2;">
+          <span class="cat-emoji">😄</span><div class="cat-name">Fun &amp; Silly Phrases</div>
+        </div>
+      </div>
+    </div>
+    <div id="phrase-list-view" style="display:none">
+      <div class="phrase-list-header">
+        <button class="back-btn" onclick="closeCategory()">← Back</button>
+        <span class="phrase-cat-title" id="phrase-cat-title"></span>
+      </div>
+      <div id="phrase-list"></div>
+    </div>
+  </div>
+
+  <!-- ── TRANSLATE TAB ── -->
+  <div class="tab-content" id="translate-tab" style="display:none">
+    <div class="wifi-note">📶 This needs wifi! Your phrases above always work offline.</div>
+    <div class="translate-box">
+      <textarea class="translate-textarea" id="translate-input" placeholder="Type what you want to say in English..."></textarea>
+      <button class="translate-btn" id="translate-btn" onclick="doTranslate()">Translate! ✨</button>
+    </div>
+    <div class="translate-result" id="translate-result">
+      <div class="result-label">Translation ✨</div>
+      <div class="result-text" id="result-text"></div>
+      <button class="speak-btn" id="speak-result-btn" onclick="speakResult()" style="margin-top:14px">🔊 Hear it!</button>
+    </div>
+  </div>
+
+  <!-- ── CONVO TAB ── -->
+  <div class="tab-content" id="convo-tab" style="display:none">
+    <div class="convo-intro">
+      <p>📱 Hand the phone to them and tap <strong>Their Turn</strong> to hear what they say in English!<br>Tap <strong>My Turn</strong> to type what you want to say.</p>
+    </div>
+    <div class="chat-window" id="chat-window">
+      <div class="chat-empty" id="chat-empty">
+        <div class="emoji">💬</div>
+        <div>Your conversation will appear here!</div>
+      </div>
+    </div>
+    <div class="status-bar" id="convo-status"></div>
+    <div class="convo-actions">
+      <button class="convo-btn convo-btn-me" onclick="showMyInput()">
+        <span class="btn-icon">✍️</span>
+        <span>My Turn</span>
+      </button>
+      <button class="convo-btn convo-btn-them" id="record-btn" onclick="theirTurn()">
+        <span class="btn-icon" id="record-icon">🎙️</span>
+        <span id="record-label">Their Turn</span>
+      </button>
+    </div>
+    <div class="convo-type-row" id="my-input-row" style="display:none">
+      <button class="convo-mic-btn" id="my-mic-btn" onclick="myTurnSpeak()" title="Speak instead of typing">🎤</button>
+      <input class="convo-input" id="convo-input" type="text" placeholder="Type or tap 🎤 to speak!">
+      <button class="convo-send" onclick="sendMyMessage()">➤</button>
+    </div>
+    <button class="clear-chat-btn" onclick="clearChat()">🗑️ Clear conversation</button>
+  </div>
+
+  <!-- ── CURRENCY TAB ── -->
+  <div class="tab-content" id="currency-tab" style="display:none">
+    <div class="feature-card" style="background:linear-gradient(135deg,#fff9e6,#fffde0);border-color:#FFD93D">
+      <div class="feature-icon">🗺️</div>
+      <div class="feature-title">Currency Converter</div>
+      <p class="feature-sub">Find out what things cost in your money!</p>
+    </div>
+    <div class="input-group">
+      <label class="field-label">Amount in local currency</label>
+      <input class="feature-input" id="currency-amount" type="number" placeholder="e.g. 10" min="0">
+    </div>
+    <div class="input-group">
+      <label class="field-label">Local currency</label>
+      <select class="lang-select" id="currency-from">
+        <option value="EUR">🇪🇺 Euro (France, Spain, Italy...)</option>
+        <option value="JPY">🇯🇵 Japanese Yen</option>
+        <option value="TRY">🇹🇷 Turkish Lira</option>
+        <option value="AED">🇦🇪 UAE Dirham</option>
+        <option value="THB">🇹🇭 Thai Baht</option>
+        <option value="MXN">🇲🇽 Mexican Peso</option>
+        <option value="CNY">🇨🇳 Chinese Yuan</option>
+        <option value="INR">🇮🇳 Indian Rupee</option>
+        <option value="USD">🇺🇸 US Dollar</option>
+        <option value="AUD">🇦🇺 Australian Dollar</option>
+        <option value="CAD">🇨🇦 Canadian Dollar</option>
+        <option value="CHF">🇨🇭 Swiss Franc</option>
+        <option value="SEK">🇸🇪 Swedish Krona</option>
+        <option value="NOK">🇳🇴 Norwegian Krone</option>
+        <option value="DKK">🇩🇰 Danish Krone</option>
+        <option value="PLN">🇵🇱 Polish Zloty</option>
+        <option value="HUF">🇭🇺 Hungarian Forint</option>
+        <option value="CZK">🇨🇿 Czech Koruna</option>
+        <option value="RON">🇷🇴 Romanian Leu</option>
+        <option value="RUB">🇷🇺 Russian Ruble</option>
+        <option value="KRW">🇰🇷 South Korean Won</option>
+        <option value="SAR">🇸🇦 Saudi Riyal</option>
+        <option value="EGP">🇪🇬 Egyptian Pound</option>
+        <option value="GRD">🇬🇷 (Euro in Greece)</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label class="field-label">Convert to</label>
+      <select class="lang-select" id="currency-to">
+        <option value="GBP">🇬🇧 British Pounds</option>
+        <option value="USD">🇺🇸 US Dollars</option>
+        <option value="EUR">🇪🇺 Euros</option>
+      </select>
+    </div>
+    <button class="feature-btn" style="background:linear-gradient(135deg,#FFD93D,#FDCB6E);color:#2D3436" onclick="convertCurrency()">Convert! 💰</button>
+    <div class="feature-result" id="currency-result" style="display:none">
+      <div class="result-big" id="currency-output"></div>
+      <div class="result-hint" id="currency-rate"></div>
+    </div>
+  </div>
+
+  <!-- ── WEATHER TAB ── -->
+  <div class="tab-content" id="weather-tab" style="display:none">
+    <div class="feature-card" style="background:linear-gradient(135deg,#f0f8ff,#e8f4ff);border-color:#74B9FF">
+      <div class="feature-icon">🌦️</div>
+      <div class="feature-title">Holiday Weather</div>
+      <p class="feature-sub">Check the weather where you're going!</p>
+    </div>
+    <div class="input-group">
+      <label class="field-label">Where are you going?</label>
+      <div style="display:flex;gap:10px">
+        <input class="feature-input" id="weather-city" type="text" placeholder="e.g. Paris, Tokyo, Rome..." style="flex:1">
+        <button class="feature-btn" style="width:auto;padding:14px 18px;margin:0;background:linear-gradient(135deg,var(--blue),var(--purple))" onclick="checkWeather()">🔍</button>
+      </div>
+    </div>
+    <div class="feature-result" id="weather-result" style="display:none">
+      <div class="weather-card" id="weather-card"></div>
+    </div>
+    <div class="wifi-note" style="margin-top:14px">📶 Needs wifi to check the weather!</div>
+  </div>
+
+  <!-- ── QUIZ TAB ── -->
+  <div class="tab-content" id="quiz-tab" style="display:none">
+    <div class="feature-card" style="background:linear-gradient(135deg,#f5f0ff,#ede8ff);border-color:#A29BFE">
+      <div class="feature-icon">🎮</div>
+      <div class="feature-title">Language Quiz!</div>
+      <p class="feature-sub">Can you guess what the phrase means?</p>
+    </div>
+    <div class="quiz-score-row">
+      <div class="quiz-score-pill" style="background:linear-gradient(135deg,var(--green),#00b894)">✅ <span id="quiz-correct">0</span> correct</div>
+      <div class="quiz-score-pill" style="background:linear-gradient(135deg,var(--orange),var(--red))">🔥 Streak: <span id="quiz-streak">0</span></div>
+      <div class="quiz-score-pill" style="background:linear-gradient(135deg,var(--blue),var(--purple))">⭐ <span id="quiz-pts">0</span> pts</div>
+    </div>
+    <div class="quiz-card" id="quiz-card">
+      <div class="quiz-lang-tag" id="quiz-lang-tag">French</div>
+      <div class="quiz-question" id="quiz-question">Loading...</div>
+      <div class="quiz-prompt">What does this mean in English?</div>
+    </div>
+    <div class="quiz-feedback" id="quiz-feedback"></div><div class="quiz-options" id="quiz-options"></div>
+    <button class="feature-btn" style="background:linear-gradient(135deg,var(--purple),var(--pink));margin-top:8px" onclick="nextQuestion()">Next question ➜</button>
+  </div>
+</div>
+
+<!-- Points popup -->
+<div class="points-popup" id="points-popup">+5 ⭐</div>
+
+<!-- Milestone modal -->
+<div class="milestone" id="milestone" onclick="closeMilestone()">
+  <div class="milestone-card" onclick="event.stopPropagation()">
+    <span class="milestone-emoji" id="ms-emoji">🎉</span>
+    <div class="milestone-title" id="ms-title">Amazing!</div>
+    <div class="milestone-sub" id="ms-sub">You earned 50 stars!</div>
+    <button class="milestone-close" onclick="closeMilestone()">Yay! ⭐</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// PHRASE DATA  (offline — works without wifi)
+// ════════════════════════════════════════════
+// translations: lang → [translated text, pronunciation guide]
+const OFFLINE = new Set(['fr','es','it','de','pt','nl','el','tr','ja','zh','ar','ru']);
+
+const PHRASES = {
+  greetings: {
+    name: "👋 Greetings",
+    items: [
+      { en: "Hello!", t: { fr:["Bonjour!","Bon-zhoor"], es:["¡Hola!","Oh-la"], it:["Ciao!","Chow"], de:["Hallo!","Hah-lo"], pt:["Olá!","Oh-lah"], nl:["Hallo!","Hah-lo"], el:["Γεια σου!","Yah-soo"], tr:["Merhaba!","Mer-ha-ba"], ja:["こんにちは!","Kon-ni-chi-wa"], zh:["你好!","Nǐ hǎo"], ar:["مرحبا!","Mar-ha-ban"], ru:["Привет!","Pri-vyet"] } },
+      { en: "Good morning!", t: { fr:["Bonjour!","Bon-zhoor"], es:["¡Buenos días!","Bway-nos dee-as"], it:["Buongiorno!","Bwon-jor-no"], de:["Guten Morgen!","Goo-ten Mor-gen"], pt:["Bom dia!","Bom jee-a"], nl:["Goedemorgen!","Hoo-de-mor-hen"], el:["Καλημέρα!","Ka-li-me-ra"], tr:["Günaydın!","Gew-nay-dun"], ja:["おはよう!","O-ha-yo"], zh:["早上好!","Zǎo shàng hǎo"], ar:["صباح الخير!","Saba-hal khair"], ru:["Доброе утро!","Dob-ro-ye oot-ro"] } },
+      { en: "Good evening!", t: { fr:["Bonsoir!","Bon-swaar"], es:["¡Buenas noches!","Bway-nas no-ches"], it:["Buonasera!","Bwon-a-se-ra"], de:["Guten Abend!","Goo-ten Ah-bent"], pt:["Boa noite!","Bo-a noy-chee"], nl:["Goedenavond!","Hoo-den-ah-vont"], el:["Καλησπέρα!","Ka-lis-pe-ra"], tr:["İyi akşamlar!","Ee ak-sham-lar"], ja:["こんばんは!","Kon-ban-wa"], zh:["晚上好!","Wǎn shàng hǎo"], ar:["مساء الخير!","Masa-al khair"], ru:["Добрый вечер!","Dob-ry vye-cher"] } },
+      { en: "Goodbye!", t: { fr:["Au revoir!","Oh ruh-vwaar"], es:["¡Adiós!","Ah-dee-os"], it:["Arrivederci!","Ar-ri-ve-der-chi"], de:["Auf Wiedersehen!","Owf Vee-der-zayn"], pt:["Tchau!","Chow"], nl:["Tot ziens!","Tot zeens"], el:["Αντίο!","An-dee-o"], tr:["Güle güle!","Gew-le gew-le"], ja:["さようなら!","Sa-yo-na-ra"], zh:["再见!","Zài jiàn"], ar:["مع السلامة!","Ma-as-sa-la-ma"], ru:["До свидания!","Do svi-da-ni-ya"] } },
+      { en: "Thank you!", t: { fr:["Merci!","Mare-see"], es:["¡Gracias!","Gra-see-as"], it:["Grazie!","Gra-tsee-eh"], de:["Danke!","Dahn-ke"], pt:["Obrigada!","Oh-bri-ga-da"], nl:["Dankjewel!","Dank-ye-vel"], el:["Ευχαριστώ!","Ef-ha-ri-sto"], tr:["Teşekkürler!","Te-shek-ew-ler"], ja:["ありがとう!","A-ri-ga-to"], zh:["谢谢!","Xiè xiè"], ar:["شكراً!","Shuk-ran"], ru:["Спасибо!","Spa-si-bo"] } },
+      { en: "Please", t: { fr:["S'il vous plaît","Seel voo play"], es:["Por favor","Por fa-vor"], it:["Per favore","Per fa-vo-re"], de:["Bitte","Bit-te"], pt:["Por favor","Por fa-vor"], nl:["Alsjeblieft","Als-ye-bleeft"], el:["Παρακαλώ","Pa-ra-ka-lo"], tr:["Lütfen","Lewt-fen"], ja:["お願いします","O-ne-gai shi-mas"], zh:["请","Qǐng"], ar:["من فضلك","Min fad-lak"], ru:["Пожалуйста","Po-zha-lu-sta"] } },
+      { en: "Yes / No", t: { fr:["Oui / Non","Wee / Non"], es:["Sí / No","See / No"], it:["Sì / No","See / No"], de:["Ja / Nein","Yah / Nine"], pt:["Sim / Não","Seeng / Now"], nl:["Ja / Nee","Yah / Nay"], el:["Ναι / Όχι","Ne / O-hi"], tr:["Evet / Hayır","E-vet / Ha-yur"], ja:["はい / いいえ","Hai / Ee-eh"], zh:["是 / 不是","Shì / Bù shì"], ar:["نعم / لا","Na-am / La"], ru:["Да / Нет","Da / Nyet"] } },
+      { en: "My name is...", t: { fr:["Je m'appelle...","Zhuh ma-pel"], es:["Me llamo...","Me ya-mo"], it:["Mi chiamo...","Mi kee-a-mo"], de:["Ich heiße...","Ich high-se"], pt:["O meu nome é...","O mew no-me eh"], nl:["Mijn naam is...","Mine nahm is"], el:["Με λένε...","Me le-ne"], tr:["Benim adım...","Be-nim a-dum"], ja:["私の名前は...","Wa-ta-shi no na-ma-e wa"], zh:["我叫...","Wǒ jiào"], ar:["اسمي...","Is-mi"], ru:["Меня зовут...","Men-ya zo-vut"] } },
+      { en: "Nice to meet you!", t: { fr:["Enchanté(e)!","On-shon-tay"], es:["¡Mucho gusto!","Moo-cho goos-to"], it:["Piacere!","Pya-che-re"], de:["Nett, Sie kennenzulernen!","Net zee ken-en-tsoo-ler-nen"], pt:["Prazer!","Pra-zer"], nl:["Aangenaam!","Ahn-he-nahm"], el:["Χάρηκα!","Ha-ri-ka"], tr:["Memnun oldum!","Mem-nun ol-dum"], ja:["はじめまして!","Ha-ji-me-mash-te"], zh:["很高兴认识你!","Hěn gāo xìng rèn shi nǐ"], ar:["سعيد بلقائك!","Sa-id bi-li-qa-ik"], ru:["Приятно познакомиться!","Pri-yat-no poz-na-ko-mi-tsya"] } },
+    ]
+  },
+  food: {
+    name: "🍕 Food & Restaurants",
+    items: [
+      { en: "A table for two, please", t: { fr:["Une table pour deux, s'il vous plaît","Ewn ta-bl poor duh"], es:["Una mesa para dos, por favor","Oo-na me-sa pa-ra dos"], it:["Un tavolo per due, per favore","Oon ta-vo-lo per doo-e"], de:["Einen Tisch für zwei, bitte","Eye-nen tish fewr tsvigh"], pt:["Uma mesa para dois, por favor","Oo-ma me-za pa-ra doys"], nl:["Een tafel voor twee, alsjeblieft","Ayn ta-fel vor tvay"], el:["Ένα τραπέζι για δύο, παρακαλώ","E-na tra-pe-zi ya dee-o"], tr:["İki kişilik masa, lütfen","Ee-ki ki-shi-lik ma-sa"], ja:["二人席をお願いします","Fu-ta-ri se-ki o o-ne-gai shi-mas"], zh:["两个人的桌子","Liǎng gè rén de zhuōzi"], ar:["طاولة لشخصين من فضلك","Ta-wi-la li-shakh-sayn"], ru:["Столик на двоих, пожалуйста","Sto-lik na dvo-ikh"] } },
+      { en: "Can I see the menu?", t: { fr:["Le menu, s'il vous plaît","Luh muh-new seel voo play"], es:["¿Me puede dar la carta?","Me pwe-de dar la kar-ta"], it:["Il menù, per favore","Il me-new per fa-vo-re"], de:["Die Speisekarte, bitte","Dee shpigh-ze-kar-te bit-te"], pt:["O cardápio, por favor","O kar-da-pee-o"], nl:["De menukaart, alsjeblieft","De men-ew-kahrt"], el:["Τον κατάλογο, παρακαλώ","Ton ka-ta-lo-go"], tr:["Menüyü görebilir miyim?","Me-new-yew ger-e-bi-lir mi-yim"], ja:["メニューをください","Me-nyu o ku-da-sai"], zh:["菜单，谢谢","Cài dān xiè xiè"], ar:["القائمة من فضلك","Al-qa-i-ma min fad-lak"], ru:["Можно меню?","Mozh-no men-yu"] } },
+      { en: "I'm vegetarian", t: { fr:["Je suis végétarien(ne)","Zhuh swee veh-zheh-ta-reen"], es:["Soy vegetariano/a","Soy ve-he-ta-ree-a-no"], it:["Sono vegetariano/a","So-no ve-je-ta-ree-a-no"], de:["Ich bin Vegetarier(in)","Ich bin ve-ge-ta-ri-er"], pt:["Sou vegetariano/a","Sow ve-je-ta-ree-a-no"], nl:["Ik ben vegetariër","Ik ben ve-ge-ta-ree-er"], el:["Είμαι χορτοφάγος","Ee-me hor-to-fa-gos"], tr:["Vejeteryanım","Ve-je-ter-ya-num"], ja:["ベジタリアンです","Be-ji-ta-ri-an des"], zh:["我吃素","Wǒ chī sù"], ar:["أنا نباتي","A-na na-ba-tee"], ru:["Я вегетарианец","Ya ve-ge-ta-ri-a-nets"] } },
+      { en: "I'm allergic to nuts", t: { fr:["Je suis allergique aux noix","Zhuh swee a-lair-zheek oh nwa"], es:["Soy alérgico/a a los frutos secos","Soy a-ler-hi-ko a los froo-tos se-kos"], it:["Sono allergico/a alle noci","So-no al-ler-ji-ko al-le no-chi"], de:["Ich bin allergisch gegen Nüsse","Ich bin a-ler-gish geh-gen new-se"], pt:["Sou alérgico/a a frutos secos","Sow a-ler-ji-ko a froo-tos se-kos"], nl:["Ik ben allergisch voor noten","Ik ben a-ler-gis vor no-ten"], el:["Είμαι αλλεργικός στους ξηρούς καρπούς","Ee-me a-ler-gi-kos stoos ksee-roos kar-poos"], tr:["Kuruyemişe alerjim var","Ku-ru-ye-mi-she a-ler-jim var"], ja:["ナッツアレルギーがあります","Nat-tsu a-re-ru-gi ga a-ri-mas"], zh:["我对坚果过敏","Wǒ duì jiān guǒ guò mǐn"], ar:["أنا حساس للمكسرات","A-na ha-sas lil-mak-sa-rat"], ru:["У меня аллергия на орехи","U men-ya a-ler-gi-ya na o-re-khi"] } },
+      { en: "This is delicious!", t: { fr:["C'est délicieux!","Say day-lee-syuh"], es:["¡Está delicioso!","Es-ta de-li-see-o-so"], it:["È delizioso!","E de-li-tsee-o-so"], de:["Das ist lecker!","Das ist le-ker"], pt:["Está delicioso!","Es-ta de-li-see-o-zo"], nl:["Dit is heerlijk!","Dit is hair-lik"], el:["Είναι νόστιμο!","Ee-ne nos-ti-mo"], tr:["Bu çok lezzetli!","Bu chok lez-zet-li"], ja:["美味しいです!","O-i-shi des"], zh:["这很好吃!","Zhè hěn hǎo chī"], ar:["هذا لذيذ!","Ha-za la-zeez"], ru:["Это вкусно!","E-to vkus-no"] } },
+      { en: "The bill, please!", t: { fr:["L'addition, s'il vous plaît!","La-dee-seeon seel voo play"], es:["¡La cuenta, por favor!","La kwen-ta por fa-vor"], it:["Il conto, per favore!","Il kon-to per fa-vo-re"], de:["Die Rechnung, bitte!","Dee rech-noong bit-te"], pt:["A conta, por favor!","A kon-ta por fa-vor"], nl:["De rekening, alsjeblieft!","De re-ke-ning als-ye-bleeft"], el:["Τον λογαριασμό, παρακαλώ!","Ton lo-ga-rias-mo"], tr:["Hesap, lütfen!","He-sap lewt-fen"], ja:["お会計をお願いします!","O-kai-kei o o-ne-gai shi-mas"], zh:["买单!","Mǎi dān"], ar:["الحساب من فضلك!","Al-hi-sab min fad-lak"], ru:["Счёт, пожалуйста!","Shcyot po-zha-lu-sta"] } },
+      { en: "Water, please", t: { fr:["De l'eau, s'il vous plaît","Duh lo seel voo play"], es:["Agua, por favor","A-gwa por fa-vor"], it:["Acqua, per favore","Ak-kwa per fa-vo-re"], de:["Wasser, bitte","Vas-ser bit-te"], pt:["Água, por favor","A-gwa por fa-vor"], nl:["Water, alsjeblieft","Wah-ter als-ye-bleeft"], el:["Νερό, παρακαλώ","Ne-ro pa-ra-ka-lo"], tr:["Su, lütfen","Soo lewt-fen"], ja:["お水をください","O-mi-zu o ku-da-sai"], zh:["水，谢谢","Shuǐ xiè xiè"], ar:["ماء من فضلك","Ma-aa min fad-lak"], ru:["Воду, пожалуйста","Vo-du po-zha-lu-sta"] } },
+      { en: "No spicy food please", t: { fr:["Pas de nourriture épicée, s'il vous plaît","Pa duh noo-ree-tewr ay-pee-say"], es:["Sin picante por favor","Sin pi-kan-te por fa-vor"], it:["Senza piccante per favore","Sen-za pik-kan-te per fa-vo-re"], de:["Bitte kein scharfes Essen","Bit-te kign shar-fes es-en"], pt:["Sem picante por favor","Sem pi-kan-te por fa-vor"], nl:["Geen pittig eten alsjeblieft","Hayn pit-tikh ay-ten"], el:["Χωρίς πικάντικο φαγητό παρακαλώ","Ho-ris pi-kan-ti-ko fa-yi-to"], tr:["Lütfen acısız yemek","Lewt-fen a-ji-suz ye-mek"], ja:["辛い食べ物はいりません","Ka-ra-i ta-be-mo-no wa i-ri-ma-sen"], zh:["请不要放辣","Qǐng bù yào fàng là"], ar:["بدون طعام حار من فضلك","Bi-doon ta-am har min fad-lak"], ru:["Без острого, пожалуйста","Bez os-tro-go po-zha-lu-sta"] } },
+    ]
+  },
+  directions: {
+    name: "🗺️ Getting Around",
+    items: [
+      { en: "Where is...?", t: { fr:["Où est...?","Oo ay"], es:["¿Dónde está...?","Don-de es-ta"], it:["Dov'è...?","Do-ve"], de:["Wo ist...?","Vo ist"], pt:["Onde fica...?","On-de fee-ka"], nl:["Waar is...?","Var is"], el:["Πού είναι...?","Poo ee-ne"], tr:["... nerede?","Ne-re-de"], ja:["...はどこですか?","Wa do-ko des ka"], zh:["...在哪里?","Zài nǎ lǐ"], ar:["أين...?","Ay-na"], ru:["Где...?","Gde"] } },
+      { en: "The bathroom / toilet", t: { fr:["Les toilettes","Lay twa-let"], es:["El baño","El ban-yo"], it:["Il bagno","Il ban-yo"], de:["Die Toilette","Dee twa-let-e"], pt:["O banheiro","O ban-yay-ro"], nl:["Het toilet","Het twa-let"], el:["Η τουαλέτα","Ee twa-le-ta"], tr:["Tuvalet","Twa-let"], ja:["トイレ","Toi-re"], zh:["厕所","Cè suǒ"], ar:["الحمام","Al-ha-mam"], ru:["Туалет","Tu-a-lyet"] } },
+      { en: "Straight ahead", t: { fr:["Tout droit","Too drwa"], es:["Todo recto","To-do rek-to"], it:["Sempre dritto","Sem-pre drit-to"], de:["Geradeaus","Ge-ra-de-ows"], pt:["Em frente","Em fren-te"], nl:["Rechtdoor","Recht-dor"], el:["Ευθεία","Ef-thi-a"], tr:["Düz gidin","Dewz gi-din"], ja:["まっすぐ","Mas-su-gu"], zh:["直走","Zhí zǒu"], ar:["على طول","A-la tool"], ru:["Прямо","Pry-a-mo"] } },
+      { en: "Turn left / right", t: { fr:["Tournez à gauche / droite","Tour-nay a gosh / drwat"], es:["Gire a la izquierda / derecha","Hee-re a la is-kyer-da / de-re-cha"], it:["Giri a sinistra / destra","Ji-ri a si-nis-tra / des-tra"], de:["Links / Rechts abbiegen","Links / Rechts ab-bee-gen"], pt:["Vire à esquerda / direita","Vee-re a es-ker-da / di-ray-ta"], nl:["Linksaf / Rechtsaf","Links-af / rechts-af"], el:["Αριστερά / Δεξιά","A-ris-te-ra / dek-sia"], tr:["Sola / Sağa dönün","So-la / sa-a dö-newn"], ja:["左/右に曲がる","Hi-da-ri / mi-gi ni ma-ga-ru"], zh:["左转/右转","Zuǒ zhuǎn / yòu zhuǎn"], ar:["يساراً / يميناً","Ya-sa-ran / ya-mi-nan"], ru:["Налево / Направо","Na-le-vo / na-pra-vo"] } },
+      { en: "The airport", t: { fr:["L'aéroport","La-eh-ro-por"], es:["El aeropuerto","El ae-ro-pwer-to"], it:["L'aeroporto","La-e-ro-por-to"], de:["Der Flughafen","Der flug-ha-fen"], pt:["O aeroporto","O ae-ro-por-to"], nl:["Het vliegveld","Het vleeg-velt"], el:["Το αεροδρόμιο","To a-e-ro-dro-mi-o"], tr:["Havalimanı","Ha-va-li-ma-nu"], ja:["空港","Ku-ko"], zh:["机场","Jī chǎng"], ar:["المطار","Al-ma-tar"], ru:["Аэропорт","A-e-ro-port"] } },
+      { en: "The train station", t: { fr:["La gare","La gar"], es:["La estación de tren","La es-ta-see-on de tren"], it:["La stazione","La sta-tsyo-ne"], de:["Der Bahnhof","Der ban-hof"], pt:["A estação de comboio","A es-ta-sow de kom-bo-yo"], nl:["Het treinstation","Het train-sta-syon"], el:["Ο σιδηροδρομικός σταθμός","O si-thi-ro-dro-mi-kos stath-mos"], tr:["Tren istasyonu","Tren is-tas-yo-nu"], ja:["電車の駅","Den-sha no e-ki"], zh:["火车站","Huǒ chē zhàn"], ar:["محطة القطار","Ma-ha-tat al-qi-tar"], ru:["Вокзал","Vok-zal"] } },
+      { en: "Can you call a taxi?", t: { fr:["Pouvez-vous appeler un taxi?","Poo-vay voo a-pe-lay un tak-see"], es:["¿Puede llamar un taxi?","Pwe-de ya-mar un tak-see"], it:["Può chiamare un taxi?","Pwo kya-ma-re un tak-see"], de:["Können Sie ein Taxi rufen?","Ker-nen zee ign tak-see roo-fen"], pt:["Pode chamar um táxi?","Po-de sha-mar um tak-see"], nl:["Kunt u een taxi bellen?","Kunt ew ayn tak-si bel-en"], el:["Μπορείτε να φωνάξετε ένα ταξί?","Bo-ree-te na fo-nak-se-te e-na tak-see"], tr:["Taksi çağırabilir misiniz?","Tak-si cha-ur-a-bi-lir mi-si-niz"], ja:["タクシーを呼んでください","Tak-shi o yon-de ku-da-sai"], zh:["帮我叫出租车好吗?","Bāng wǒ jiào chū zū chē hǎo ma"], ar:["هل يمكنك استدعاء سيارة أجرة؟","Hal yum-ki-nak is-tid-aa say-ya-ra uj-ra"], ru:["Вызовите такси, пожалуйста","Vy-zo-vi-te tak-si po-zha-lu-sta"] } },
+    ]
+  },
+  shopping: {
+    name: "🛍️ Shopping",
+    items: [
+      { en: "How much does this cost?", t: { fr:["Combien ça coûte?","Com-byan sa koot"], es:["¿Cuánto cuesta?","Kwan-to kwes-ta"], it:["Quanto costa?","Kwan-to kos-ta"], de:["Was kostet das?","Vas kos-tet das"], pt:["Quanto custa?","Kwan-to kus-ta"], nl:["Hoeveel kost dit?","Hoo-vayl kost dit"], el:["Πόσο κοστίζει;","Po-so kos-ti-zi"], tr:["Bu ne kadar?","Bu ne ka-dar"], ja:["これはいくらですか?","Ko-re wa i-ku-ra des ka"], zh:["多少钱?","Duō shao qián"], ar:["بكم هذا؟","Bi-kam ha-za"], ru:["Сколько стоит?","Skol-ko sto-it"] } },
+      { en: "That's too expensive", t: { fr:["C'est trop cher","Say tro shair"], es:["Es muy caro","Es mwee ka-ro"], it:["È troppo caro","E trop-po ka-ro"], de:["Das ist zu teuer","Das ist tsoo toy-er"], pt:["É muito caro","E mwee-to ka-ro"], nl:["Dat is te duur","Dat is te dewr"], el:["Είναι πολύ ακριβό","Ee-ne po-li ak-ri-vo"], tr:["Bu çok pahalı","Bu chok pa-ha-li"], ja:["高すぎます","Ta-ka su-gi-mas"], zh:["太贵了","Tài guì le"], ar:["هذا غالي جداً","Ha-za gha-li ji-dan"], ru:["Слишком дорого","Slish-kom do-ro-go"] } },
+      { en: "Can I try this on?", t: { fr:["Je peux essayer?","Zhuh puh es-say-yay"], es:["¿Puedo probármelo?","Pwe-do pro-bar-me-lo"], it:["Posso provarlo?","Pos-so pro-var-lo"], de:["Kann ich das anprobieren?","Kan ich das an-pro-bee-ren"], pt:["Posso experimentar?","Po-so ex-pe-ri-men-tar"], nl:["Kan ik dit passen?","Kan ik dit pas-sen"], el:["Μπορώ να το δοκιμάσω;","Bo-ro na to do-ki-ma-so"], tr:["Deneyebilir miyim?","De-ne-ye-bi-lir mi-yim"], ja:["試着できますか?","Shi-chaku de-ki-mas ka"], zh:["可以试穿吗?","Kě yǐ shì chuān ma"], ar:["هل أستطيع تجربته؟","Hal as-ta-ti-a taj-ri-ba-ta-hu"], ru:["Можно примерить?","Mozh-no pri-me-rit"] } },
+      { en: "Do you have a different colour?", t: { fr:["Vous avez une autre couleur?","Voo za-vay ewn oh-tre koo-lur"], es:["¿Lo tiene en otro color?","Lo tye-ne en o-tro ko-lor"], it:["Ce l'ha in un altro colore?","Che la in un al-tro ko-lo-re"], de:["Haben Sie das in einer anderen Farbe?","Ha-ben zee in eye-ner an-de-ren far-be"], pt:["Tem numa cor diferente?","Tem noo-ma kor di-fe-ren-te"], nl:["Heeft u een andere kleur?","Hayft ew ayn an-de-re klewr"], el:["Έχετε άλλο χρώμα;","E-he-te al-lo hro-ma"], tr:["Başka rengi var mı?","Bash-ka ren-gi var mu"], ja:["別の色はありますか?","Be-tsu no i-ro wa a-ri-mas ka"], zh:["有其他颜色吗?","Yǒu qí tā yán sè ma"], ar:["هل لديكم لون آخر؟","Hal la-dai-kum lawn a-khar"], ru:["Есть другой цвет?","Yest dru-goy tsvet"] } },
+      { en: "I'll take it!", t: { fr:["Je le prends!","Zhuh luh prong"], es:["¡Me lo llevo!","Me lo ye-vo"], it:["Lo prendo!","Lo pren-do"], de:["Ich nehme es!","Ich neh-me es"], pt:["Vou levar!","Vow le-var"], nl:["Ik neem het!","Ik naym het"], el:["Το παίρνω!","To pair-no"], tr:["Alıyorum!","A-li-yo-rum"], ja:["これをください!","Ko-re o ku-da-sai"], zh:["我要这个!","Wǒ yào zhè ge"], ar:["سآخذه!","Sa-a-khu-zu-hu"], ru:["Я возьму это!","Ya voz-mu e-to"] } },
+      { en: "Where are the changing rooms?", t: { fr:["Où sont les cabines d'essayage?","Oo son lay ka-been de-say-yazh"], es:["¿Dónde están los probadores?","Don-de es-tan los pro-ba-do-res"], it:["Dove sono i camerini?","Do-ve so-no i ka-me-ri-ni"], de:["Wo sind die Umkleidekabinen?","Vo zint dee um-kly-de-ka-bee-nen"], pt:["Onde ficam os provadores?","On-de fee-kam os pro-va-do-res"], nl:["Waar zijn de paskamers?","Var zayn de pas-kah-mers"], el:["Πού είναι τα δοκιμαστήρια;","Poo ee-ne ta do-ki-mas-ti-ri-a"], tr:["Soyunma odaları nerede?","So-yun-ma o-da-la-ru ne-re-de"], ja:["試着室はどこですか?","Shi-chaku-shitsu wa do-ko des ka"], zh:["试衣间在哪里?","Shì yī jiān zài nǎ lǐ"], ar:["أين غرف تغيير الملابس؟","Ay-na ghur-af tagh-yeer al-ma-la-bis"], ru:["Где примерочные?","Gde pri-me-ro-chny-ye"] } },
+    ]
+  },
+  hotel: {
+    name: "🏨 Hotel",
+    items: [
+      { en: "I have a reservation", t: { fr:["J'ai une réservation","Zhay ewn ray-zair-va-seeohn"], es:["Tengo una reserva","Ten-go oo-na re-ser-va"], it:["Ho una prenotazione","O oo-na pre-no-ta-tsyo-ne"], de:["Ich habe eine Reservierung","Ich ha-be eye-ne re-zer-vee-rung"], pt:["Tenho uma reserva","Ten-yo oo-ma re-zer-va"], nl:["Ik heb een reservering","Ik heb ayn re-zer-ve-ring"], el:["Έχω κράτηση","E-ho kra-ti-si"], tr:["Rezervasyonum var","Re-zer-vas-yo-num var"], ja:["予約があります","Yo-yaku ga a-ri-mas"], zh:["我有预订","Wǒ yǒu yù dìng"], ar:["لدي حجز","La-dai hajz"], ru:["У меня есть бронь","U men-ya yest bron"] } },
+      { en: "What time is check-out?", t: { fr:["À quelle heure est le départ?","A kel ur ay luh day-par"], es:["¿A qué hora es el check-out?","A ke o-ra es el chek-owt"], it:["A che ora è il check-out?","A ke o-ra e il chek-owt"], de:["Wann ist der Check-out?","Van ist der chek-owt"], pt:["Qual é o horário do check-out?","Kwal e o o-ra-rio do shek-owt"], nl:["Hoe laat is het uitchecken?","Hoo laht is het owt-chek-en"], el:["Τι ώρα είναι το check-out?","Ti o-ra ee-ne to chek-owt"], tr:["Check-out saati nedir?","Chek-owt sa-a-ti ne-dir"], ja:["チェックアウトは何時ですか?","Chek-ku-ow-to wa nan-ji des ka"], zh:["几点退房?","Jǐ diǎn tuì fáng"], ar:["في أي وقت المغادرة؟","Fi ayy waqt al-mu-gha-da-ra"], ru:["Во сколько выезд?","Vo skol-ko vy-ezd"] } },
+      { en: "My room is too noisy", t: { fr:["Ma chambre est trop bruyante","Ma shom-bre ay tro broo-ee-yont"], es:["Mi habitación hace mucho ruido","Mi a-bi-ta-syon a-se moo-cho rwee-do"], it:["La mia camera è troppo rumorosa","La mia ka-me-ra e trop-po roo-mo-ro-za"], de:["Mein Zimmer ist zu laut","Mine tsim-mer ist tsoo lowt"], pt:["O meu quarto está muito barulhento","O mew kwar-to es-ta mwee-to ba-ru-lyen-to"], nl:["Mijn kamer is te lawaaierig","Mine ka-mer is te la-why-e-rig"], el:["Το δωμάτιό μου είναι πολύ θορυβώδες","To do-ma-tio moo ee-ne po-li tho-ri-vo-des"], tr:["Odam çok gürültülü","O-dam chok gew-rewl-tew-lew"], ja:["部屋がうるさすぎます","He-ya ga u-ru-sa su-gi-mas"], zh:["我的房间太吵了","Wǒ de fáng jiān tài chǎo le"], ar:["غرفتي صاخبة جداً","Ghur-fa-ti sa-khi-ba jid-dan"], ru:["В номере слишком шумно","V no-me-re slish-kom shum-no"] } },
+      { en: "Can I have another towel?", t: { fr:["Puis-je avoir une autre serviette?","Pwee-je a-vwar ewn oh-tre sair-vyet"], es:["¿Puede darme otra toalla?","Pwe-de dar-me o-tra to-a-ya"], it:["Posso avere un altro asciugamano?","Pos-so a-ve-re un al-tro a-shoo-ga-ma-no"], de:["Kann ich noch ein Handtuch haben?","Kan ich nokh ighn hand-tookh ha-ben"], pt:["Posso ter mais uma toalha?","Po-so ter mais oo-ma to-al-ya"], nl:["Mag ik nog een handdoek?","Mag ik nokh ayn hand-dook"], el:["Μπορώ να έχω μία ακόμα πετσέτα;","Bo-ro na e-ho mia a-ko-ma pet-se-ta"], tr:["Bir havlu daha alabilir miyim?","Bir hav-lu da-ha a-la-bi-lir mi-yim"], ja:["タオルをもう一枚ください","Ta-o-ru o mo-u i-chi-mai ku-da-sai"], zh:["能再给我一条毛巾吗?","Néng zài gěi wǒ yī tiáo máo jīn ma"], ar:["هل يمكنني الحصول على منشفة أخرى؟","Hal yum-kin-ni al-hu-sul a-la min-sha-fa ukh-ra"], ru:["Можно ещё полотенце?","Mozh-no yesh-cho po-lo-ten-tse"] } },
+      { en: "The WiFi password, please", t: { fr:["Le mot de passe WiFi, s'il vous plaît","Luh mo duh pas wee-fee seel voo play"], es:["La contraseña del WiFi, por favor","La kon-tra-sen-ya del wee-fee"], it:["La password del WiFi, per favore","La pas-word del wee-fee per fa-vo-re"], de:["Das WLAN-Passwort, bitte","Das vee-lan pas-vort bit-te"], pt:["A senha do WiFi, por favor","A sen-ya do wee-fee"], nl:["Het WiFi-wachtwoord, alsjeblieft","Het wee-fee-wacht-vort"], el:["Ο κωδικός WiFi, παρακαλώ","O ko-di-kos wee-fee"], tr:["WiFi şifresi, lütfen","Wee-fee shif-re-si lewt-fen"], ja:["WiFiのパスワードを教えてください","Wai-fai no pas-wa-do o o-shi-e-te ku-da-sai"], zh:["WiFi密码是多少?","WiFi mì mǎ shì duō shao"], ar:["كلمة مرور الواي فاي من فضلك","Ka-li-mat mu-ror al-wai-fai min fad-lak"], ru:["Пароль от WiFi, пожалуйста","Pa-rol ot wai-fai po-zha-lu-sta"] } },
+      { en: "Is breakfast included?", t: { fr:["Le petit-déjeuner est inclus?","Luh puh-tee day-zhuh-nay ay tan-klew"], es:["¿Está incluido el desayuno?","Es-ta in-kloo-ee-do el de-sa-yu-no"], it:["La colazione è inclusa?","La ko-la-tsyo-ne e in-kloo-za"], de:["Ist das Frühstück inklusive?","Ist das frews-tewk in-kloo-zee-ve"], pt:["O pequeno-almoço está incluído?","O pe-ke-no al-mo-so es-ta in-kloo-ee-do"], nl:["Is het ontbijt inbegrepen?","Is het ont-beyt in-be-hray-pen"], el:["Περιλαμβάνεται το πρωινό;","Pe-ri-lam-va-ne-te to pro-i-no"], tr:["Kahvaltı dahil mi?","Kah-val-tu da-hil mi"], ja:["朝食は含まれますか?","Cho-shoku wa fuku-ma-re-mas ka"], zh:["包括早餐吗?","Bāo kuò zǎo cān ma"], ar:["هل يشمل الفطور؟","Hal yash-mil al-fu-tur"], ru:["Завтрак включён?","Zav-trak vkly-u-chyon"] } },
+    ]
+  },
+  emergency: {
+    name: "🚨 Emergencies",
+    items: [
+      { en: "Help!", t: { fr:["Au secours!","Oh suh-koor"], es:["¡Ayuda!","A-yoo-da"], it:["Aiuto!","A-yoo-to"], de:["Hilfe!","Hil-fe"], pt:["Socorro!","So-ko-ho"], nl:["Help!","Help"], el:["Βοήθεια!","Vo-i-thia"], tr:["İmdat!","Im-dat"], ja:["助けて!","Ta-su-ke-te"], zh:["救命!","Jiù mìng"], ar:["النجدة!","Al-naj-da"], ru:["Помогите!","Po-mo-gi-te"] } },
+      { en: "I need a doctor", t: { fr:["J'ai besoin d'un médecin","Zhay buh-zwan dun may-duh-san"], es:["Necesito un médico","Ne-se-si-to un me-di-ko"], it:["Ho bisogno di un medico","O bi-zon-yo di un me-di-ko"], de:["Ich brauche einen Arzt","Ich brow-khe eye-nen artst"], pt:["Preciso de um médico","Pre-see-zo de um me-di-ko"], nl:["Ik heb een dokter nodig","Ik heb ayn dok-ter no-dikh"], el:["Χρειάζομαι γιατρό","Khria-zo-me ya-tro"], tr:["Doktora ihtiyacım var","Dok-to-ra ih-ti-ya-jum var"], ja:["医者が必要です","I-sha ga hi-tsu-yo des"], zh:["我需要医生","Wǒ xū yào yī shēng"], ar:["أحتاج إلى طبيب","Ah-taj i-la ta-bib"], ru:["Мне нужен врач","Mne nu-zhen vrach"] } },
+      { en: "Call the police!", t: { fr:["Appelez la police!","A-pe-lay la po-lees"], es:["¡Llame a la policía!","Ya-me a la po-li-see-a"], it:["Chiami la polizia!","Kya-mi la po-li-tsee-a"], de:["Rufen Sie die Polizei!","Roo-fen zee dee po-li-tsigh"], pt:["Chame a polícia!","Sha-me a po-li-sia"], nl:["Bel de politie!","Bel de po-lit-see"], el:["Καλέστε την αστυνομία!","Ka-les-te tin as-ti-no-mi-a"], tr:["Polisi arayın!","Po-li-si a-ra-yun"], ja:["警察を呼んでください!","Ke-i-sa-tsu o yon-de ku-da-sai"], zh:["叫警察!","Jiào jǐng chá"], ar:["اتصل بالشرطة!","It-ta-sil bis-shur-ta"], ru:["Вызовите полицию!","Vy-zo-vi-te po-li-tsi-yu"] } },
+      { en: "I'm lost", t: { fr:["Je suis perdu(e)","Zhuh swee pair-doo"], es:["Estoy perdido/a","Es-toy per-di-do"], it:["Mi sono perso/a","Mi so-no per-so"], de:["Ich habe mich verlaufen","Ich ha-be mich fer-low-fen"], pt:["Estou perdido/a","Es-tow per-di-do"], nl:["Ik ben verdwaald","Ik ben fer-dvaald"], el:["Έχω χαθεί","E-ho ha-thi"], tr:["Kayboldum","Kay-bol-dum"], ja:["迷子になりました","Ma-i-go ni na-ri-mash-ta"], zh:["我迷路了","Wǒ mí lù le"], ar:["أنا ضائع","A-na daa-i"], ru:["Я заблудился","Ya za-blu-dil-sya"] } },
+      { en: "I need an ambulance", t: { fr:["J'ai besoin d'une ambulance","Zhay buh-zwan dewn om-bew-lonss"], es:["Necesito una ambulancia","Ne-se-si-to oo-na am-boo-lan-sya"], it:["Ho bisogno di un'ambulanza","O bi-zon-yo di un am-boo-lan-dza"], de:["Ich brauche einen Krankenwagen","Ich brow-khe eye-nen kran-ken-va-gen"], pt:["Preciso de uma ambulância","Pre-see-zo de oo-ma am-boo-lan-sya"], nl:["Ik heb een ambulance nodig","Ik heb ayn am-boo-lan-se no-dikh"], el:["Χρειάζομαι ασθενοφόρο","Khria-zo-me as-the-no-fo-ro"], tr:["Ambulansa ihtiyacım var","Am-boo-lan-sa ih-ti-ya-jum var"], ja:["救急車が必要です","Kyu-kyu-sha ga hi-tsu-yo des"], zh:["我需要救护车","Wǒ xū yào jiù hù chē"], ar:["أحتاج إلى سيارة إسعاف","Ah-taj i-la say-ya-rat is-aaf"], ru:["Мне нужна скорая","Mne nuzh-na sko-ra-ya"] } },
+      { en: "I've been robbed", t: { fr:["On m'a volé","On ma vo-lay"], es:["Me han robado","Me an ro-ba-do"], it:["Sono stato/a derubato/a","So-no sta-to de-ru-ba-to"], de:["Ich wurde bestohlen","Ich vur-de be-shto-len"], pt:["Fui roubado/a","Fwee ro-ba-do"], nl:["Ik ben beroofd","Ik ben be-rooft"], el:["Με έκλεψαν","Me e-klep-san"], tr:["Soyuldum","So-yul-dum"], ja:["盗まれました","Nu-su-ma-re-mash-ta"], zh:["我被抢劫了","Wǒ bèi qiǎng jié le"], ar:["سُرقت","Su-riqt"], ru:["Меня ограбили","Men-ya o-gra-bi-li"] } },
+    ]
+  },
+  fun: {
+    name: "😄 Fun & Silly",
+    items: [
+      { en: "You're very funny!", t: { fr:["Tu es très drôle!","Tew ay tray drole"], es:["¡Eres muy gracioso/a!","E-res mwee gra-syos-o"], it:["Sei molto divertente!","Sei mol-to di-ver-ten-te"], de:["Du bist sehr lustig!","Doo bist zayr lus-tikh"], pt:["És muito engraçado/a!","Es mwee-to en-gra-sa-do"], nl:["Je bent erg grappig!","Ye bent erkh grap-ikh"], el:["Είσαι πολύ αστείος/α!","Ee-se po-li as-ti-os"], tr:["Çok komiksin!","Chok ko-mik-sin"], ja:["あなたはとても面白い!","A-na-ta wa to-te-mo o-mo-shi-roi"], zh:["你很好笑!","Nǐ hěn hǎo xiào"], ar:["أنت مضحك جداً!","An-ta mud-hik ji-dan"], ru:["Ты очень смешной!","Ty o-chen smesh-noy"] } },
+      { en: "Where's the party?", t: { fr:["C'est où la fête?","Say oo la fet"], es:["¿Dónde es la fiesta?","Don-de es la fyes-ta"], it:["Dov'è la festa?","Do-ve la fes-ta"], de:["Wo ist die Party?","Vo ist dee par-ty"], pt:["Onde é a festa?","On-de e a fes-ta"], nl:["Waar is het feest?","Var is het fayst"], el:["Πού είναι το πάρτι;","Poo ee-ne to par-ti"], tr:["Parti nerede?","Par-ti ne-re-de"], ja:["パーティーはどこ?","Pa-ti wa do-ko"], zh:["派对在哪里?","Pài duì zài nǎ lǐ"], ar:["أين الحفلة؟","Ay-na al-haf-la"], ru:["Где вечеринка?","Gde ve-che-rin-ka"] } },
+      { en: "I love your country!", t: { fr:["J'adore votre pays!","Zha-dore vo-tre pay-ee"], es:["¡Me encanta tu país!","Me en-kan-ta too pa-is"], it:["Adoro il tuo paese!","A-do-ro il too-o pa-e-ze"], de:["Ich liebe euer Land!","Ich lee-be oy-er lant"], pt:["Adoro o teu país!","A-do-ro o te-oo pa-is"], nl:["Ik hou van jullie land!","Ik how van yul-ee lant"], el:["Λατρεύω τη χώρα σου!","La-tre-vo ti ho-ra soo"], tr:["Ülkenizi çok seviyorum!","Ewl-ke-ni-zi chok se-vi-yo-rum"], ja:["あなたの国が大好きです!","A-na-ta no ku-ni ga dai-su-ki des"], zh:["我爱你们的国家!","Wǒ ài nǐ men de guó jiā"], ar:["أحب بلدكم!","U-hib bi-la-da-kum"], ru:["Я обожаю вашу страну!","Ya o-bo-zha-yu va-shu stra-nu"] } },
+      { en: "Can I take a selfie with you?", t: { fr:["Je peux prendre un selfie avec vous?","Zhuh puh prong-dre un sel-fi a-vek voo"], es:["¿Puedo hacerme un selfie contigo?","Pwe-do a-ser-me un sel-fi kon-ti-go"], it:["Posso fare un selfie con te?","Pos-so fa-re un sel-fie kon te"], de:["Darf ich ein Selfie mit dir machen?","Darf ich ign sel-fi mit deer ma-khen"], pt:["Posso tirar uma selfie contigo?","Po-so ti-rar oo-ma sel-fi kon-ti-go"], nl:["Mag ik een selfie met je maken?","Mag ik ayn sel-fi met ye ma-ken"], el:["Μπορούμε να βγάλουμε selfie;","Bo-roo-me na vga-loo-me sel-fi"], tr:["Seninle selfie çekebilir miyim?","Se-nin-le sel-fi che-ke-bi-lir mi-yim"], ja:["一緒に自撮りしていいですか?","Is-sho ni ji-do-ri shi-te ii des ka"], zh:["可以和你自拍吗?","Kě yǐ hé nǐ zì pāi ma"], ar:["هل يمكنني أخذ صورة سيلفي معك؟","Hal yum-kin-ni akh-zu su-ra sel-fi ma-ak"], ru:["Можно сделать селфи с вами?","Mozh-no sde-lat sel-fi s va-mi"] } },
+      { en: "I speak a tiny bit of your language!", t: { fr:["Je parle un tout petit peu votre langue!","Zhuh parl un too puh-ti puh vo-tre long"], es:["¡Hablo un poquito de tu idioma!","Ab-lo un po-ki-to de too i-dyo-ma"], it:["Parlo un pochino la tua lingua!","Par-lo un po-ki-no la too-a lin-gwa"], de:["Ich spreche ein kleines bisschen Ihre Sprache!","Ich shpre-khe ign kly-nes bis-khen ee-re shpra-khe"], pt:["Falo um pouquinho da tua língua!","Fa-lo um po-kin-yo da too-a lin-gwa"], nl:["Ik spreek een klein beetje jouw taal!","Ik sprayk ayn klign bay-tye yow tahl"], el:["Μιλάω λίγο τη γλώσσα σου!","Mi-la-o li-go ti glos-sa soo"], tr:["Dilinizi biraz konuşabiliyorum!","Di-li-ni-zi bi-raz ko-nu-sha-bi-li-yo-rum"], ja:["少しだけあなたの言語が話せます!","Su-ko-shi da-ke a-na-ta no gen-go ga ha-na-se-mas"], zh:["我会说一点点你们的语言!","Wǒ huì shuō yī diǎn diǎn nǐ men de yǔ yán"], ar:["أتحدث القليل من لغتك!","A-ta-had-dath al-qa-lil min lu-gha-tik"], ru:["Я немного говорю на вашем языке!","Ya nem-no-go go-vo-ryu na va-shem ya-zy-ke"] } },
+      { en: "You are my new best friend!", t: { fr:["Tu es mon nouveau meilleur ami(e)!","Tew ay mon noo-vo may-yur a-mi"], es:["¡Eres mi nuevo mejor amigo/a!","E-res mi nwe-vo me-hor a-mi-go"], it:["Sei il mio nuovo migliore amico/a!","Sei il mio nwo-vo mil-yo-re a-mi-ko"], de:["Du bist mein neuer bester Freund!","Doo bist mine noy-er bes-ter froynt"], pt:["És o meu novo melhor amigo/a!","Es o mew no-vo mel-yor a-mi-go"], nl:["Jij bent mijn nieuwe beste vriend!","Yigh bent mine nee-we bes-te freent"], el:["Είσαι ο νέος καλύτερος φίλος μου!","Ee-se o ne-os ka-li-te-ros fi-los moo"], tr:["Sen benim yeni en iyi arkadaşımsın!","Sen be-nim ye-ni en i-yi ar-ka-da-shum-sun"], ja:["あなたは私の新しい親友です!","A-na-ta wa wa-ta-shi no a-ta-ra-shii shin-yu des"], zh:["你是我新的最好的朋友!","Nǐ shì wǒ xīn de zuì hǎo de péng yǒu"], ar:["أنت أفضل صديق جديد لي!","Ant af-dal sa-diq ja-did li"], ru:["Ты мой новый лучший друг!","Ty moy no-vy luch-shy drugh"] } },
+      { en: "This place is amazing!", t: { fr:["Cet endroit est incroyable!","Set on-drwa ay tan-krwa-ya-bl"], es:["¡Este lugar es increíble!","Es-te loo-gar es in-kre-i-ble"], it:["Questo posto è fantastico!","Kwes-to pos-to e fan-tas-ti-ko"], de:["Dieser Ort ist unglaublich!","Dee-zer ort ist un-glow-blich"], pt:["Este lugar é incrível!","Es-te loo-gar e in-kree-vel"], nl:["Deze plek is geweldig!","De-ze plek is he-vel-dikh"], el:["Αυτό το μέρος είναι καταπληκτικό!","Af-to to me-ros ee-ne ka-ta-plik-ti-ko"], tr:["Burası inanılmaz!","Bu-ra-su i-na-nul-maz"], ja:["ここは素晴らしい!","Ko-ko wa su-ba-ra-shii"], zh:["这个地方太棒了!","Zhè gè dì fāng tài bàng le"], ar:["هذا المكان رائع!","Ha-za al-ma-kan ra-i"], ru:["Это место потрясающее!","E-to myes-to pot-rya-sa-yu-shche-ye"] } },
+    ]
+  }
+};
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let points = 0;
+let selectedAvatar = '🦋';
+let userName = '';
+const MILESTONES = [
+  { pts: 25,  emoji: '🌟', title: 'First Steps!',    sub: 'You unlocked your first star milestone!' },
+  { pts: 50,  emoji: '🎉', title: 'Getting Good!',   sub: 'You earned 50 stars — you\'re on fire!' },
+  { pts: 100, emoji: '🏆', title: 'Word Wizard!',    sub: '100 stars! You\'re basically a linguist now!' },
+  { pts: 200, emoji: '🌍', title: 'World Traveller!',sub: '200 stars! The world is your oyster!' },
+  { pts: 500, emoji: '👑', title: 'Language Legend!', sub: '500 stars! You\'re an absolute Lingo legend!' },
+];
+const shownMilestones = new Set();
+
+// ════════════════════════════════════════════
+// WELCOME
+// ════════════════════════════════════════════
+document.querySelectorAll('.avatar-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedAvatar = btn.dataset.emoji;
+  });
+});
+
+function startApp() {
+  const input = document.getElementById('name-input');
+  userName = input.value.trim() || 'Explorer';
+  document.getElementById('header-user').textContent = selectedAvatar + ' ' + userName;
+  document.getElementById('welcome-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'block';
+}
+
+document.getElementById('name-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') startApp();
+});
+
+// ════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════
+function switchTab(tab) {
+  ['phrases','translate','convo','currency','weather','quiz'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+    document.getElementById(t+'-tab').style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'quiz') initQuiz();
+}
+
+// ════════════════════════════════════════════
+// LANGUAGE CHANGE
+// ════════════════════════════════════════════
+function onLangChange() {
+  // If phrase list is open, refresh it
+  if (document.getElementById('phrase-list-view').style.display !== 'none') {
+    const currentCat = document.getElementById('phrase-cat-title').dataset.key;
+    if (currentCat) openCategory(currentCat);
+  }
+}
+
+// ════════════════════════════════════════════
+// PHRASES
+// ════════════════════════════════════════════
+function openCategory(catKey) {
+  const cat = PHRASES[catKey];
+  const lang = document.getElementById('lang-select').value;
+  const hasOffline = OFFLINE.has(lang);
+
+  document.getElementById('categories-view').style.display = 'none';
+  document.getElementById('phrase-list-view').style.display = 'block';
+  const titleEl = document.getElementById('phrase-cat-title');
+  titleEl.textContent = cat.name;
+  titleEl.dataset.key = catKey;
+
+  const list = document.getElementById('phrase-list');
+  list.innerHTML = '';
+
+  cat.items.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'phrase-item';
+    const transId = `t-${catKey}-${idx}`;
+    const pronId  = `p-${catKey}-${idx}`;
+    const hasData = hasOffline && item.t[lang];
+
+    div.innerHTML = `
+      <div class="phrase-english">${item.en}</div>
+      <div class="tap-hint">Tap to translate</div>
+      <div class="phrase-translation">
+        <div class="phrase-translated-text" id="${transId}">${hasData ? item.t[lang][0] : '...'}</div>
+        ${hasData ? `<div class="phrase-pronunciation">🗣 Say it like: "${item.t[lang][1]}"</div>` : `<div class="phrase-pronunciation" id="${pronId}"></div>`}
+        <button class="speak-btn" onclick="event.stopPropagation(); speakText(document.getElementById('${transId}').textContent, '${lang}', this)">🔊 Hear it!</button>
+      </div>`;
+
+    div.addEventListener('click', () => {
+      const wasOpen = div.classList.contains('expanded');
+      document.querySelectorAll('.phrase-item').forEach(p => p.classList.remove('expanded'));
+      if (!wasOpen) {
+        div.classList.add('expanded');
+        if (!hasData) fetchOnlinePhrase(item.en, lang, transId, pronId);
+        addPoints(5, '+5 ⭐');
+      }
+    });
+    list.appendChild(div);
+  });
+}
+
+async function fetchOnlinePhrase(text, lang, transId, pronId) {
+  const transEl = document.getElementById(transId);
+  const pronEl  = document.getElementById(pronId);
+  if (!transEl) return;
+  transEl.textContent = 'Translating...';
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`);
+    const data = await res.json();
+    transEl.textContent = data.responseData.translatedText || text;
+    if (pronEl) pronEl.textContent = '(pronunciation guide coming soon for this language!)';
+  } catch {
+    transEl.textContent = '(Needs wifi to translate)';
+  }
+}
+
+function closeCategory() {
+  document.getElementById('categories-view').style.display = 'block';
+  document.getElementById('phrase-list-view').style.display = 'none';
+}
+
+// ════════════════════════════════════════════
+// TRANSLATE
+// ════════════════════════════════════════════
+async function doTranslate() {
+  const text = document.getElementById('translate-input').value.trim();
+  if (!text) return;
+  const lang = document.getElementById('lang-select').value;
+  const btn = document.getElementById('translate-btn');
+  const resultBox = document.getElementById('translate-result');
+  const resultText = document.getElementById('result-text');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Translating...';
+  resultBox.classList.remove('visible');
+
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`);
+    const data = await res.json();
+    resultText.textContent = data.responseData.translatedText || 'Could not translate.';
+    resultBox.classList.add('visible');
+    addPoints(10, '+10 ⭐');
+  } catch {
+    resultText.textContent = "⚠️ Couldn't connect — check your wifi and try again!";
+    resultBox.classList.add('visible');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Translate! ✨';
+}
+
+document.getElementById('translate-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doTranslate(); }
+});
+
+// ════════════════════════════════════════════
+// SPEECH
+// ════════════════════════════════════════════
+const LANG_LOCALE = {
+  fr:'fr-FR', es:'es-ES', it:'it-IT', de:'de-DE', pt:'pt-PT', nl:'nl-NL',
+  el:'el-GR', tr:'tr-TR', ja:'ja-JP', zh:'zh-CN', ar:'ar-SA', ru:'ru-RU',
+  pl:'pl-PL', sv:'sv-SE', da:'da-DK', no:'nb-NO', fi:'fi-FI', cs:'cs-CZ',
+  hu:'hu-HU', ro:'ro-RO', ko:'ko-KR', hi:'hi-IN'
+};
+
+function speakText(text, lang, btn) {
+  if (!text || text === '...' || text === 'Translating...') return;
+
+  if (btn) {
+    btn.classList.add('speaking');
+    btn.textContent = '🔊 Speaking...';
+    const reset = () => { btn.classList.remove('speaking'); btn.textContent = '🔊 Hear it!'; };
+
+    // Use Google TTS — same clear voice for every language!
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob&ttsspeed=0.8`;
+    const audio = new Audio(url);
+    audio.onended = reset;
+    audio.onerror = () => {
+      reset();
+      // Fall back to device voice if Google TTS fails (e.g. no wifi)
+      fallbackSpeak(text, lang);
+    };
+    audio.play().catch(() => { reset(); fallbackSpeak(text, lang); });
+  } else {
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob&ttsspeed=0.8`;
+    const audio = new Audio(url);
+    audio.onerror = () => fallbackSpeak(text, lang);
+    audio.play().catch(() => fallbackSpeak(text, lang));
+  }
+}
+
+function fallbackSpeak(text, lang) {
+  // Offline backup — uses the phone's built-in voice
+  const locale = LANG_LOCALE[lang] || lang;
+  const utter  = new SpeechSynthesisUtterance(text);
+  utter.lang   = locale;
+  utter.rate   = 0.80;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+function speakResult() {
+  const text = document.getElementById('result-text').textContent;
+  const lang = document.getElementById('lang-select').value;
+  const btn  = document.getElementById('speak-result-btn');
+  speakText(text, lang, btn);
+}
+
+// ════════════════════════════════════════════
+// ════════════════════════════════════════════
+function addPoints(amount, label) {
+  points += amount;
+  document.getElementById('points-display').textContent = points;
+
+  const popup = document.getElementById('points-popup');
+  popup.textContent = label || `+${amount} ⭐`;
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 1600);
+
+  // Check milestones
+  for (const m of MILESTONES) {
+    if (points >= m.pts && !shownMilestones.has(m.pts)) {
+      shownMilestones.add(m.pts);
+      setTimeout(() => showMilestone(m), 800);
+      break;
+    }
+  }
+}
+
+function showMilestone(m) {
+  document.getElementById('ms-emoji').textContent = m.emoji;
+  document.getElementById('ms-title').textContent = m.title;
+  document.getElementById('ms-sub').textContent = m.sub;
+  document.getElementById('milestone').classList.add('show');
+}
+
+function closeMilestone() {
+  document.getElementById('milestone').classList.remove('show');
+}
+
+// ════════════════════════════════════════════
+// CONVERSATION
+// ════════════════════════════════════════════
+let recognition = null;
+let isRecording = false;
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function setConvoStatus(msg) {
+  document.getElementById('convo-status').textContent = msg;
+}
+
+function showMyInput() {
+  const row = document.getElementById('my-input-row');
+  row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+  if (row.style.display === 'flex') document.getElementById('convo-input').focus();
+}
+
+let myRecognition = null;
+let myRecording = false;
+
+function myTurnSpeak() {
+  if (myRecording) {
+    myRecording = false;
+    if (myRecognition) { try { myRecognition.stop(); } catch(e){} }
+    document.getElementById('my-mic-btn').classList.remove('recording');
+    document.getElementById('my-mic-btn').textContent = '🎤';
+    setConvoStatus('');
+    return;
+  }
+  if (!SpeechRec) {
+    setConvoStatus("⚠️ Voice not supported here — try Chrome!");
+    return;
+  }
+  myRecognition = new SpeechRec();
+  myRecognition.lang = 'en-GB';
+  myRecognition.continuous = false;
+  myRecognition.interimResults = false;
+
+  myRecognition.onstart = () => {
+    myRecording = true;
+    document.getElementById('my-mic-btn').classList.add('recording');
+    document.getElementById('my-mic-btn').textContent = '⏹️';
+    setConvoStatus('🎤 Listening to you... speak now!');
+  };
+
+  myRecognition.onresult = (e) => {
+    const heard = e.results[0][0].transcript;
+    document.getElementById('convo-input').value = heard;
+    setConvoStatus('Got it! Sending...');
+    myRecording = false;
+    document.getElementById('my-mic-btn').classList.remove('recording');
+    document.getElementById('my-mic-btn').textContent = '🎤';
+    // Auto-send after a short pause
+    setTimeout(() => sendMyMessage(), 600);
+  };
+
+  myRecognition.onerror = (e) => {
+    myRecording = false;
+    document.getElementById('my-mic-btn').classList.remove('recording');
+    document.getElementById('my-mic-btn').textContent = '🎤';
+    if (e.error === 'no-speech') setConvoStatus("Didn't catch that — try again!");
+    else setConvoStatus("Something went wrong. Try again!");
+    setTimeout(() => setConvoStatus(''), 3000);
+  };
+
+  myRecognition.onend = () => {
+    myRecording = false;
+    document.getElementById('my-mic-btn').classList.remove('recording');
+    document.getElementById('my-mic-btn').textContent = '🎤';
+  };
+
+  myRecognition.start();
+}
+
+async function sendMyMessage() {
+  const input = document.getElementById('convo-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  document.getElementById('my-input-row').style.display = 'none';
+
+  const lang = document.getElementById('lang-select').value;
+  setConvoStatus('Translating...');
+
+  // Translate English → target language
+  let translated = text;
+  try {
+    const res  = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`);
+    const data = await res.json();
+    translated = data.responseData.translatedText || text;
+  } catch { translated = text; }
+
+  addBubble('me', text, translated, lang);
+  setConvoStatus('Speaking in ' + document.getElementById('lang-select').options[document.getElementById('lang-select').selectedIndex].text.replace(/^.{4}/,'') + '...');
+  speakText(translated, lang, null);
+  setTimeout(() => setConvoStatus(''), 3000);
+  addPoints(5, '+5 ⭐');
+}
+
+function theirTurn() {
+  if (isRecording) {
+    stopRecording();
+    return;
+  }
+  if (!SpeechRec) {
+    setConvoStatus("⚠️ Voice recording isn't supported on this browser. Try Chrome!");
+    return;
+  }
+  const lang = document.getElementById('lang-select').value;
+  const locale = LANG_LOCALE[lang] || lang;
+
+  recognition = new SpeechRec();
+  recognition.lang = locale;
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('record-btn').classList.add('recording');
+    document.getElementById('record-icon').textContent = '⏹️';
+    document.getElementById('record-label').textContent = 'Stop';
+    setConvoStatus('🎙️ Listening... speak now!');
+  };
+
+  recognition.onresult = async (e) => {
+    const heard = e.results[0][0].transcript;
+    setConvoStatus('Translating what they said...');
+    // Translate target language → English
+    let inEnglish = heard;
+    try {
+      const res  = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(heard)}&langpair=${lang}|en`);
+      const data = await res.json();
+      inEnglish = data.responseData.translatedText || heard;
+    } catch { inEnglish = heard; }
+
+    addBubble('them', heard, inEnglish, lang);
+    setConvoStatus('');
+    addPoints(10, '+10 ⭐');
+  };
+
+  recognition.onerror = (e) => {
+    stopRecording();
+    if (e.error === 'no-speech') setConvoStatus("Didn't hear anything — try again!");
+    else if (e.error === 'network') setConvoStatus("⚠️ Needs wifi for recording!");
+    else setConvoStatus("Hmm, something went wrong. Try again!");
+    setTimeout(() => setConvoStatus(''), 3000);
+  };
+
+  recognition.onend = () => { stopRecording(); };
+  recognition.start();
+}
+
+function stopRecording() {
+  isRecording = false;
+  if (recognition) { try { recognition.stop(); } catch(e){} }
+  document.getElementById('record-btn').classList.remove('recording');
+  document.getElementById('record-icon').textContent = '🎙️';
+  document.getElementById('record-label').textContent = 'Their Turn';
+}
+
+function addBubble(who, primary, secondary, lang) {
+  const window_el = document.getElementById('chat-window');
+  const empty     = document.getElementById('chat-empty');
+  if (empty) empty.remove();
+
+  const langName = document.getElementById('lang-select').options[document.getElementById('lang-select').selectedIndex].text.replace(/^..\s/,'');
+
+  const wrap = document.createElement('div');
+  wrap.className = `bubble-wrap ${who}`;
+
+  if (who === 'me') {
+    wrap.innerHTML = `
+      <div class="bubble-who">You (English → ${langName})</div>
+      <div class="bubble">${primary}</div>
+      <div class="bubble-sub">🗣 ${secondary}</div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="bubble-who">Them (${langName} → English)</div>
+      <div class="bubble">${primary}</div>
+      <div class="bubble-sub">💬 ${secondary}</div>`;
+  }
+
+  window_el.appendChild(wrap);
+  window_el.scrollTop = window_el.scrollHeight;
+}
+
+function clearChat() {
+  const w = document.getElementById('chat-window');
+  w.innerHTML = '<div class="chat-empty" id="chat-empty"><div class="emoji">💬</div><div>Your conversation will appear here!</div></div>';
+  setConvoStatus('');
+}
+
+// Enter key sends message in convo
+document.getElementById('convo-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendMyMessage();
+});
+
+// ════════════════════════════════════════════
+// CURRENCY CONVERTER
+// ════════════════════════════════════════════
+async function convertCurrency() {
+  const amount = parseFloat(document.getElementById('currency-amount').value);
+  if (!amount || amount <= 0) { alert('Enter an amount first! 😊'); return; }
+  let from = document.getElementById('currency-from').value;
+  const to = document.getElementById('currency-to').value;
+  if (from === 'GRD') from = 'EUR'; // Greece uses Euro
+  if (from === to) {
+    showCurrencyResult(amount, amount, from, to, 1); return;
+  }
+  const resultEl = document.getElementById('currency-result');
+  const outputEl = document.getElementById('currency-output');
+  outputEl.textContent = 'Converting...';
+  resultEl.style.display = 'block';
+  try {
+    const res  = await fetch(`https://api.frankfurter.app/latest?from=${from}&to=${to}`);
+    const data = await res.json();
+    const rate = data.rates[to];
+    showCurrencyResult(amount, amount * rate, from, to, rate);
+    addPoints(5, '+5 ⭐');
+  } catch {
+    outputEl.textContent = '⚠️ Needs wifi!';
+    document.getElementById('currency-rate').textContent = '';
+  }
+}
+
+function showCurrencyResult(amount, converted, from, to, rate) {
+  const symbols = { GBP:'£', USD:'$', EUR:'€', JPY:'¥', TRY:'₺', AED:'د.إ', THB:'฿', MXN:'$', CNY:'¥', INR:'₹', AUD:'A$', CAD:'C$', CHF:'Fr', SEK:'kr', NOK:'kr', DKK:'kr', PLN:'zł', HUF:'Ft', CZK:'Kč', RON:'lei', RUB:'₽', KRW:'₩', SAR:'﷼', EGP:'£' };
+  const sym = symbols[to] || to;
+  document.getElementById('currency-output').textContent = `${sym}${converted.toFixed(2)}`;
+  document.getElementById('currency-rate').textContent = `${amount} ${from} = ${sym}${converted.toFixed(2)} ${to} • Rate: 1 ${from} = ${sym}${rate.toFixed(4)}`;
+  document.getElementById('currency-result').style.display = 'block';
+}
+
+// ════════════════════════════════════════════
+// WEATHER
+// ════════════════════════════════════════════
+const WEATHER_EMOJI = {
+  0:'☀️',1:'☀️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'🌨️',75:'❄️',77:'❄️',
+  80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+const WEATHER_DESC = {
+  0:'Sunny ☀️',1:'Mostly sunny',2:'Partly cloudy',3:'Overcast',45:'Foggy',48:'Foggy',
+  51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',
+  71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',
+  80:'Light showers',81:'Showers',82:'Heavy showers',85:'Snow showers',86:'Heavy snow showers',
+  95:'Thunderstorm',96:'Thunderstorm with hail',99:'Heavy thunderstorm'
+};
+const PACK_TIPS = {
+  sunny: '😎 Sunny! Pack sunscreen, sunglasses and light clothes!',
+  rainy: '☔ Looks rainy! Pack an umbrella and a waterproof jacket!',
+  cold:  '🧥 Its chilly! Pack warm layers and a cosy jacket!',
+  snowy: '⛄ Its snowing! Pack boots, a big coat and gloves!',
+  windy: '💨 Looks breezy! Pack a light jacket just in case!',
+  hot:   '🌴 Super hot! Pack shorts, sunscreen and stay hydrated!'
+};
+
+async function checkWeather() {
+  const city = document.getElementById('weather-city').value.trim();
+  if (!city) { alert('Enter a city name first! 🌍'); return; }
+  const resultEl = document.getElementById('weather-result');
+  const cardEl   = document.getElementById('weather-card');
+  cardEl.innerHTML = '<div style="padding:20px;font-weight:800;color:#aaa">🔍 Finding weather...</div>';
+  resultEl.style.display = 'block';
+  try {
+    // Geocode city
+    const geoRes  = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
+    const geoData = await geoRes.json();
+    if (!geoData.results || !geoData.results.length) {
+      cardEl.innerHTML = '<div style="padding:20px;font-weight:800;color:var(--red)">😕 City not found! Try another spelling.</div>';
+      return;
+    }
+    const { latitude, longitude, name, country } = geoData.results[0];
+    // Get weather
+    const wRes  = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature&wind_speed_unit=mph&temperature_unit=celsius`);
+    const wData = await wRes.json();
+    const c = wData.current;
+    const code = c.weather_code;
+    const emoji = WEATHER_EMOJI[code] || '🌤️';
+    const desc  = WEATHER_DESC[code]  || 'Mixed weather';
+    const temp  = Math.round(c.temperature_2m);
+    const feels = Math.round(c.apparent_temperature);
+    const humidity = c.relative_humidity_2m;
+    const wind = Math.round(c.wind_speed_10m);
+    // Pack tip
+    let tip = PACK_TIPS.windy;
+    if (code >= 71) tip = PACK_TIPS.snowy;
+    else if (code >= 51) tip = PACK_TIPS.rainy;
+    else if (code >= 95) tip = PACK_TIPS.rainy;
+    else if (temp >= 28) tip = PACK_TIPS.hot;
+    else if (temp >= 18) tip = PACK_TIPS.sunny;
+    else if (temp < 10)  tip = PACK_TIPS.cold;
+    cardEl.innerHTML = `
+      <div class="weather-city">${name}, ${country}</div>
+      <div class="weather-main">${emoji}</div>
+      <div class="weather-temp">${temp}°C</div>
+      <div class="weather-desc">${desc}</div>
+      <div class="weather-details">
+        <div class="weather-detail"><div class="val">${feels}°C</div><div class="lbl">Feels like</div></div>
+        <div class="weather-detail"><div class="val">${humidity}%</div><div class="lbl">Humidity</div></div>
+        <div class="weather-detail"><div class="val">${wind}mph</div><div class="lbl">Wind</div></div>
+      </div>
+      <div class="weather-advice">${tip}</div>`;
+    addPoints(5, '+5 ⭐');
+  } catch {
+    cardEl.innerHTML = '<div style="padding:20px;font-weight:800;color:var(--red)">⚠️ Needs wifi to check weather!</div>';
+  }
+}
+
+document.getElementById('weather-city').addEventListener('keypress', e => {
+  if (e.key === 'Enter') checkWeather();
+});
+
+// ════════════════════════════════════════════
+// QUIZ
+// ════════════════════════════════════════════
+let quizCorrect = 0, quizStreak = 0, quizPts = 0, quizAnswered = false;
+
+function getAllPhrases() {
+  const all = [];
+  Object.values(PHRASES).forEach(cat => {
+    cat.items.forEach(item => all.push(item));
+  });
+  return all;
+}
+
+function initQuiz() {
+  if (document.getElementById('quiz-options').children.length === 0) nextQuestion();
+}
+
+function nextQuestion() {
+  const lang = document.getElementById('lang-select').value;
+  if (!OFFLINE.has(lang)) {
+    document.getElementById('quiz-question').textContent = '😕 Quiz only works for offline languages! Pick French, Spanish, Italian, German or others from the list.';
+    document.getElementById('quiz-options').innerHTML = '';
+    return;
+  }
+  quizAnswered = false;
+  document.getElementById('quiz-feedback').textContent = '';
+
+  const all  = getAllPhrases().filter(p => p.t[lang]);
+  if (all.length < 4) return;
+
+  // Pick a random question
+  const qItem = all[Math.floor(Math.random() * all.length)];
+  const answer = qItem.en;
+  const shown  = qItem.t[lang][0];
+
+  // Pick 3 wrong answers
+  const others = all.filter(p => p.en !== answer);
+  const wrongs = [];
+  while (wrongs.length < 3 && others.length > 0) {
+    const idx = Math.floor(Math.random() * others.length);
+    wrongs.push(others.splice(idx, 1)[0].en);
+  }
+
+  // Shuffle options
+  const options = [answer, ...wrongs].sort(() => Math.random() - 0.5);
+
+  // Set lang tag
+  const langNames = { fr:'French',es:'Spanish',it:'Italian',de:'German',pt:'Portuguese',nl:'Dutch',el:'Greek',tr:'Turkish',ja:'Japanese',zh:'Chinese',ar:'Arabic',ru:'Russian' };
+  document.getElementById('quiz-lang-tag').textContent = langNames[lang] || lang;
+  document.getElementById('quiz-question').textContent = shown;
+
+  const optContainer = document.getElementById('quiz-options');
+  optContainer.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => answerQuiz(btn, opt, answer, optContainer);
+    optContainer.appendChild(btn);
+  });
+}
+
+function answerQuiz(btn, chosen, answer, container) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const fb = document.getElementById('quiz-feedback');
+  // Mark all options
+  container.querySelectorAll('.quiz-opt').forEach(b => {
+    b.classList.add('disabled');
+    if (b.textContent === answer) b.classList.add('correct');
+  });
+  if (chosen === answer) {
+    btn.classList.add('correct');
+    quizCorrect++;
+    quizStreak++;
+    const bonus = quizStreak >= 3 ? 15 : 10;
+    quizPts += bonus;
+    fb.textContent = quizStreak >= 3 ? `🔥 ${quizStreak} in a row! +${bonus} pts` : '✅ Correct! +10 pts';
+    fb.style.color = '#00b894';
+    addPoints(bonus, `+${bonus} ⭐`);
+  } else {
+    btn.classList.add('wrong');
+    quizStreak = 0;
+    fb.textContent = `❌ The answer was: "${answer}"`;
+    fb.style.color = 'var(--red)';
+  }
+  document.getElementById('quiz-correct').textContent = quizCorrect;
+  document.getElementById('quiz-streak').textContent  = quizStreak;
+  document.getElementById('quiz-pts').textContent     = quizPts;
+}
+
+</script>
+</body>
+</html>
