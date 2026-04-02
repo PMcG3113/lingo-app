@@ -1035,40 +1035,54 @@ const LANG_LOCALE = {
   hu:'hu-HU', ro:'ro-RO', ko:'ko-KR', hi:'hi-IN'
 };
 
-function speakText(text, lang, btn) {
-  if (!text || text === '...' || text === 'Translating...') return;
-
-  if (btn) {
-    btn.classList.add('speaking');
-    btn.textContent = '🔊 Speaking...';
-    const reset = () => { btn.classList.remove('speaking'); btn.textContent = '🔊 Hear it!'; };
-
-    // Use Google TTS — same clear voice for every language!
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob&ttsspeed=0.8`;
-    const audio = new Audio(url);
-    audio.onended = reset;
-    audio.onerror = () => {
-      reset();
-      // Fall back to device voice if Google TTS fails (e.g. no wifi)
-      fallbackSpeak(text, lang);
-    };
-    audio.play().catch(() => { reset(); fallbackSpeak(text, lang); });
-  } else {
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob&ttsspeed=0.8`;
-    const audio = new Audio(url);
-    audio.onerror = () => fallbackSpeak(text, lang);
-    audio.play().catch(() => fallbackSpeak(text, lang));
-  }
+function getBestVoice(locale) {
+  const voices   = window.speechSynthesis.getVoices();
+  const langCode = locale.split('-')[0];
+  const exact    = voices.filter(v => v.lang === locale);
+  const partial  = voices.filter(v => v.lang.startsWith(langCode));
+  const pool     = exact.length ? exact : partial;
+  // Prefer enhanced/premium voices — they sound much clearer!
+  return pool.find(v => /enhanced|premium/i.test(v.name))
+      || pool.find(v => /google/i.test(v.name))
+      || pool[0] || null;
 }
 
-function fallbackSpeak(text, lang) {
-  // Offline backup — uses the phone's built-in voice
+function speakText(text, lang, btn) {
+  if (!text || text === '...' || text === 'Translating...') return;
+  window.speechSynthesis.cancel();
+
   const locale = LANG_LOCALE[lang] || lang;
   const utter  = new SpeechSynthesisUtterance(text);
   utter.lang   = locale;
-  utter.rate   = 0.80;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
+  utter.rate   = 0.82;
+  utter.pitch  = 1.0;
+  utter.volume = 1.0;
+
+  const reset = () => {
+    if (btn) { btn.classList.remove('speaking'); btn.textContent = '🔊 Hear it!'; }
+  };
+
+  const doSpeak = () => {
+    const voice = getBestVoice(locale);
+    if (voice) utter.voice = voice;
+    utter.onend  = reset;
+    utter.onerror = reset;
+    if (btn) {
+      btn.classList.add('speaking');
+      btn.textContent = '🔊 Speaking...';
+    }
+    window.speechSynthesis.speak(utter);
+  };
+
+  // Voices sometimes load slowly on first use — wait if needed
+  if (window.speechSynthesis.getVoices().length > 0) {
+    doSpeak();
+  } else {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak();
+    };
+  }
 }
 
 function speakResult() {
