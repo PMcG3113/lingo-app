@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Lingo 🌈</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Lingo">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#A29BFE">
+  <!-- Apple touch icon (inline SVG as data URI for simplicity) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23FF6B9D'/><stop offset='40%25' stop-color='%23FFD93D'/><stop offset='70%25' stop-color='%2374B9FF'/><stop offset='100%25' stop-color='%23A29BFE'/></linearGradient></defs><rect width='512' height='512' rx='120' fill='url(%23g)'/><text x='256' y='320' font-family='Arial' font-weight='bold' font-size='180' text-anchor='middle' fill='white'>Oui!</text></svg">
   <style>
     :root {
       --pink: #FF6B9D;
@@ -1528,6 +1537,85 @@ function answerQuiz(btn, chosen, answer, container) {
   document.getElementById('quiz-correct').textContent = quizCorrect;
   document.getElementById('quiz-streak').textContent  = quizStreak;
   document.getElementById('quiz-pts').textContent     = quizPts;
+}
+
+// ════════════════════════════════════════════
+// PWA — Service Worker & Install Prompt
+// ════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/lingo-app/service-worker.js')
+      .then(() => console.log('Lingo SW registered!'))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// Show "Add to Home Screen" install button
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install banner after a short delay
+  setTimeout(showInstallBanner, 2000);
+});
+
+function showInstallBanner() {
+  if (!deferredPrompt) return;
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.innerHTML = `
+    <div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+      background:linear-gradient(135deg,#A29BFE,#FF6B9D);color:white;
+      border-radius:20px;padding:14px 20px;display:flex;align-items:center;gap:12px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.2);z-index:99999;max-width:340px;width:90%;
+      font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;animation:popIn 0.3s ease">
+      <span style="font-size:28px">📲</span>
+      <div style="flex:1">
+        <div style="font-family:'Fredoka One',cursive;font-size:16px">Install Lingo!</div>
+        <div style="opacity:0.9;font-size:12px">Add to your home screen as an app</div>
+      </div>
+      <button onclick="installApp()" style="background:white;color:#A29BFE;border:none;
+        border-radius:12px;padding:8px 14px;font-family:'Fredoka One',cursive;
+        font-size:14px;cursor:pointer">Install</button>
+      <button onclick="document.getElementById('install-banner').remove()" 
+        style="background:rgba(255,255,255,0.2);color:white;border:none;
+        border-radius:10px;padding:8px 10px;cursor:pointer;font-size:16px">✕</button>
+    </div>`;
+  document.body.appendChild(banner);
+}
+
+async function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner')?.remove();
+  if (outcome === 'accepted') {
+    setTimeout(() => showMilestone({ emoji:'📲', title:'Lingo Installed!', sub:'You can now open Lingo from your home screen!' }), 500);
+  }
+}
+
+// iOS Safari — show manual instructions since it doesn't support beforeinstallprompt
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+if (isIOS && !isInStandaloneMode) {
+  setTimeout(() => {
+    const banner = document.createElement('div');
+    banner.innerHTML = `
+      <div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+        background:linear-gradient(135deg,#A29BFE,#74B9FF);color:white;
+        border-radius:20px;padding:16px 20px;
+        box-shadow:0 8px 30px rgba(0,0,0,0.2);z-index:99999;max-width:340px;width:90%;
+        font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;text-align:center;
+        animation:popIn 0.3s ease">
+        <div style="font-family:'Fredoka One',cursive;font-size:17px;margin-bottom:8px">📲 Install Lingo on iPhone!</div>
+        <div style="opacity:0.9;line-height:1.6">Tap the <strong>Share button</strong> (the box with an arrow) at the bottom of Safari, then tap <strong>"Add to Home Screen"</strong> 🌈</div>
+        <button onclick="this.parentElement.parentElement.remove()" style="margin-top:12px;background:white;
+          color:#A29BFE;border:none;border-radius:12px;padding:8px 20px;
+          font-family:'Fredoka One',cursive;font-size:15px;cursor:pointer">Got it! ✨</button>
+      </div>`;
+    document.body.appendChild(banner);
+  }, 3000);
 }
 
 </script>

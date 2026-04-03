@@ -1,0 +1,21 @@
+{
+  "name": "Lingo - Holiday Language Buddy",
+  "short_name": "Lingo",
+  "description": "Your holiday language buddy! Translate phrases, have conversations and learn languages on the go.",
+  "start_url": "/lingo-app/",
+  "display": "standalone",
+  "background_color": "#FFF6F0",
+  "theme_color": "#A29BFE",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23FF6B9D'/><stop offset='40%25' stop-color='%23FFD93D'/><stop offset='70%25' stop-color='%2374B9FF'/><stop offset='100%25' stop-color='%23A29BFE'/></linearGradient></defs><rect width='512' height='512' rx='120' fill='url(%23g)'/><text x='256' y='320' font-family='Arial' font-weight='bold' font-size='180' text-anchor='middle' fill='white'>Oui!</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "travel", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}
